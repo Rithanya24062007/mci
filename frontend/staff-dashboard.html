@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Dashboard — QueuePro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --corp-navy:    #0f172a;
+            --corp-blue:    #1d4ed8;
+            --corp-blue-lt: #3b82f6;
+            --corp-teal:    #0d9488;
+            --corp-red:     #dc2626;
+            --corp-amber:   #d97706;
+            --corp-green:   #16a34a;
+            --slate-50:     #f8fafc;
+            --slate-100:    #f1f5f9;
+            --slate-200:    #e2e8f0;
+            --slate-300:    #cbd5e1;
+            --slate-400:    #94a3b8;
+            --slate-500:    #64748b;
+            --slate-600:    #475569;
+            --slate-700:    #334155;
+            --white:        #ffffff;
+            --sidebar-w:    240px;
+            --header-h:     64px;
+            --radius:       10px;
+            --radius-lg:    14px;
+            --shadow-sm:    0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+            --shadow-lg:    0 10px 25px rgba(0,0,0,.12), 0 4px 10px rgba(0,0,0,.08);
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--slate-100); color: var(--corp-navy); min-height: 100vh; display: flex; }
+
+        /* ── Sidebar ─────────────────────────────────────────── */
+        .sidebar {
+            width: var(--sidebar-w); background: var(--corp-navy);
+            min-height: 100vh; position: fixed; left: 0; top: 0;
+            display: flex; flex-direction: column; z-index: 100;
+        }
+        .sidebar-brand {
+            display: flex; align-items: center; gap: 12px;
+            padding: 20px 20px; border-bottom: 1px solid rgba(255,255,255,.08);
+        }
+        .sidebar-brand-icon {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--corp-blue), var(--corp-teal));
+            border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .sidebar-brand-icon svg { width: 19px; height: 19px; color: #fff; }
+        .sidebar-brand-text h2 { font-size: 14px; font-weight: 700; color: #fff; }
+        .sidebar-brand-text span { font-size: 10px; color: var(--slate-400); letter-spacing: .6px; text-transform: uppercase; }
+        .sidebar-nav { padding: 16px 10px; flex: 1; }
+        .sidebar-label { font-size: 10px; font-weight: 600; color: var(--slate-500); letter-spacing: 1px; text-transform: uppercase; padding: 6px 10px 6px; }
+        .sidebar-link {
+            display: flex; align-items: center; gap: 10px;
+            padding: 9px 12px; border-radius: 7px;
+            color: var(--slate-400); font-size: 13px; font-weight: 500;
+            border: none; background: none; width: 100%; text-align: left; cursor: pointer;
+            margin-bottom: 2px; transition: background .14s, color .14s;
+        }
+        .sidebar-link svg { width: 16px; height: 16px; flex-shrink: 0; }
+        .sidebar-link:hover { background: rgba(255,255,255,.06); color: #fff; }
+        .sidebar-link.active { background: rgba(29,78,216,.25); color: var(--corp-blue-lt); }
+        .sidebar-footer { padding: 14px 10px; border-top: 1px solid rgba(255,255,255,.07); }
+        .sidebar-user {
+            display: flex; align-items: center; gap: 9px;
+            padding: 9px 12px; background: rgba(255,255,255,.05); border-radius: 8px;
+        }
+        .sidebar-user-avatar {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, var(--corp-blue), var(--corp-teal));
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0;
+        }
+        .sidebar-user-info { flex: 1; min-width: 0; }
+        .sidebar-user-info strong { display: block; font-size: 12px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sidebar-user-info span { font-size: 10.5px; color: var(--slate-400); }
+        .btn-logout {
+            background: none; border: none; cursor: pointer;
+            color: var(--slate-400); padding: 4px; border-radius: 5px;
+            display: flex; align-items: center; transition: color .14s, background .14s;
+        }
+        .btn-logout:hover { color: var(--corp-red); background: rgba(220,38,38,.1); }
+        .btn-logout svg { width: 16px; height: 16px; }
+
+        /* ── Main ────────────────────────────────────────────── */
+        .main-wrapper { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+        .topbar {
+            height: var(--header-h); background: var(--white);
+            border-bottom: 1px solid var(--slate-200);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 28px; position: sticky; top: 0; z-index: 50;
+            box-shadow: var(--shadow-sm);
+        }
+        .topbar-title h1 { font-size: 17px; font-weight: 700; color: var(--corp-navy); }
+        .topbar-title p  { font-size: 12px; color: var(--slate-500); margin-top: 1px; }
+        .staff-badge {
+            display: flex; align-items: center; gap: 7px;
+            background: rgba(13,148,136,.08); border: 1px solid rgba(13,148,136,.18);
+            border-radius: 20px; padding: 5px 12px 5px 7px;
+        }
+        .staff-badge-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--corp-teal); }
+        .staff-badge span { font-size: 12.5px; font-weight: 600; color: var(--corp-teal); }
+        .page-content { padding: 24px 28px; flex: 1; }
+
+        /* ── Stat Row ────────────────────────────────────────── */
+        .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
+        .stat-card {
+            background: var(--white); border: 1px solid var(--slate-200);
+            border-radius: var(--radius-lg); padding: 18px 20px;
+            box-shadow: var(--shadow-sm);
+        }
+        .stat-card.blue-accent  { border-left: 3px solid var(--corp-blue); }
+        .stat-card.teal-accent  { border-left: 3px solid var(--corp-teal); }
+        .stat-card.green-accent { border-left: 3px solid var(--corp-green); }
+        .stat-label { font-size: 11.5px; font-weight: 600; color: var(--slate-500); text-transform: uppercase; letter-spacing: .5px; }
+        .stat-value { font-size: 32px; font-weight: 800; color: var(--corp-navy); margin: 4px 0 2px; line-height: 1; }
+        .stat-sub   { font-size: 11.5px; color: var(--slate-400); }
+
+        /* ── Content Grid ────────────────────────────────────── */
+        .content-grid { display: grid; grid-template-columns: 320px 1fr; gap: 18px; align-items: start; }
+
+        /* ── Card ────────────────────────────────────────────── */
+        .card {
+            background: var(--white); border: 1px solid var(--slate-200);
+            border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+        .card-header {
+            display: flex; align-items: center; gap: 11px;
+            padding: 16px 20px; border-bottom: 1px solid var(--slate-100);
+        }
+        .card-icon {
+            width: 34px; height: 34px; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .card-icon.blue  { background: rgba(29,78,216,.1);  color: var(--corp-blue); }
+        .card-icon.teal  { background: rgba(13,148,136,.1); color: var(--corp-teal); }
+        .card-icon.amber { background: rgba(217,119,6,.1);  color: var(--corp-amber); }
+        .card-icon svg { width: 17px; height: 17px; }
+        .card-title  { font-size: 14px; font-weight: 700; color: var(--corp-navy); }
+        .card-sub    { font-size: 11.5px; color: var(--slate-500); margin-top: 1px; }
+        .card-body   { padding: 20px; }
+
+        /* ── Serving Panel ───────────────────────────────────── */
+        .serving-block {
+            background: linear-gradient(135deg, var(--corp-navy), #1e293b);
+            border-radius: 12px; padding: 24px 20px;
+            text-align: center; margin-bottom: 16px;
+        }
+        .serving-label-sm { font-size: 10.5px; font-weight: 600; color: var(--slate-400); text-transform: uppercase; letter-spacing: .7px; }
+        .serving-big {
+            font-size: 64px; font-weight: 900; color: #fff;
+            line-height: 1; margin: 6px 0 4px;
+            text-shadow: 0 4px 20px rgba(29,78,216,.4);
+        }
+        .serving-sub-text { font-size: 12px; color: var(--slate-400); }
+
+        .btn-next {
+            width: 100%; height: 50px;
+            background: linear-gradient(135deg, var(--corp-blue), #2563eb);
+            color: #fff; border: none; border-radius: 10px;
+            font-size: 15px; font-weight: 700; font-family: 'Inter', sans-serif;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 9px;
+            box-shadow: 0 3px 10px rgba(29,78,216,.3); transition: all .2s;
+        }
+        .btn-next svg { width: 18px; height: 18px; }
+        .btn-next:hover { box-shadow: 0 6px 18px rgba(29,78,216,.4); transform: translateY(-1px); }
+        .btn-next:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+        /* ── Live Tracking ───────────────────────────────────── */
+        .tracking-active-pill {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(13,148,136,.1); border: 1px solid rgba(13,148,136,.2);
+            border-radius: 20px; padding: 4px 12px;
+            font-size: 12px; font-weight: 600; color: var(--corp-teal);
+            margin-bottom: 14px;
+        }
+        .tracking-active-pill span { width: 7px; height: 7px; border-radius: 50%; background: var(--corp-teal); animation: blink 1.2s ease-in-out infinite; }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+        .sensor-block {
+            background: var(--slate-50); border: 1px solid var(--slate-200);
+            border-radius: 9px; padding: 16px; text-align: center; margin-bottom: 10px;
+        }
+                        .sensor-big { font-size: 52px; font-weight: 800; color: var(--corp-teal); }
+        .sensor-label { font-size: 11.5px; color: var(--slate-500); margin-top: 4px; }
+        .sensor-badges { display: flex; justify-content: center; gap: 10px; margin-top: 10px; }
+        .sensor-badge-entry { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: var(--corp-green); background: rgba(22,163,74,.08); border: 1px solid rgba(22,163,74,.2); padding: 4px 10px; border-radius: 20px; }
+        .sensor-badge-exit  { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: var(--corp-red);   background: rgba(220,38,38,.08);  border: 1px solid rgba(220,38,38,.2);  padding: 4px 10px; border-radius: 20px; }
+        .last-update-text { font-size: 11.5px; color: var(--slate-400); text-align: center; }
+
+        /* ── Queue List ──────────────────────────────────────── */
+        .queue-empty {
+            padding: 32px 0; text-align: center;
+            display: flex; flex-direction: column; align-items: center; gap: 10px;
+        }
+        .queue-empty svg { width: 32px; height: 32px; color: var(--slate-300); }
+        .queue-empty p { font-size: 13.5px; color: var(--slate-500); font-weight: 500; }
+
+        .queue-item {
+            display: flex; align-items: center; gap: 14px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--slate-100);
+        }
+        .queue-item:last-child { border-bottom: none; }
+        .queue-token { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+
+        .token-badge {
+            width: 42px; height: 42px;
+            background: linear-gradient(135deg, var(--corp-blue), #2563eb);
+            border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; font-weight: 800; color: #fff;
+            flex-shrink: 0; box-shadow: 0 2px 6px rgba(29,78,216,.25);
+        }
+        .customer-info { flex: 1; min-width: 0; }
+        .customer-name { font-size: 13.5px; font-weight: 600; color: var(--corp-navy); display: block; }
+        .customer-phone {
+            font-size: 12px; color: var(--slate-500);
+            display: flex; align-items: center; gap: 4px; margin-top: 2px;
+        }
+        .customer-phone svg { width: 12px; height: 12px; }
+        .queue-time { font-size: 11.5px; color: var(--slate-400); white-space: nowrap; flex-shrink: 0; }
+        .empty-state { font-size: 13px; color: var(--slate-500); text-align: center; padding: 20px 0; }
+
+        /* ── Responsive ──────────────────────────────────────── */
+        @media (max-width: 1024px) { .content-grid { grid-template-columns: 1fr; } .stats-row { grid-template-columns: repeat(3,1fr); } }
+        @media (max-width: 768px)  { .sidebar { transform: translateX(-100%); } .main-wrapper { margin-left: 0; } .stats-row { grid-template-columns: 1fr 1fr; } }
+    </style>
+</head>
+<body>
+
+    <!-- ═══════════════════ SIDEBAR ═══════════════════ -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="sidebar-brand-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+            </div>
+            <div class="sidebar-brand-text">
+                <h2>QueuePro</h2>
+                <span>Staff Panel</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="sidebar-label">Queue</div>
+            <button class="sidebar-link active">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7"/>
+                </svg>
+                Dashboard
+            </button>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="sidebar-user-avatar" id="staffAvatar">S</div>
+                <div class="sidebar-user-info">
+                    <strong id="staffName">Staff</strong>
+                    <span>Staff Member</span>
+                </div>
+                <button class="btn-logout" id="logoutBtn" title="Logout">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ═══════════════════ MAIN ════════════════════ -->
+    <div class="main-wrapper">
+
+        <header class="topbar">
+            <div class="topbar-title">
+                <h1>Staff Dashboard</h1>
+                <p>Manage your queue in real time</p>
+            </div>
+            <div class="staff-badge">
+                <div class="staff-badge-dot"></div>
+                <span id="staffBadgeName">Staff Member</span>
+            </div>
+        </header>
+
+        <main class="page-content">
+
+            <!-- Stats Row -->
+            <div class="stats-row">
+                <div class="stat-card blue-accent">
+                    <div class="stat-label">Currently Serving</div>
+                    <div class="stat-value" id="currentTokenStat">---</div>
+                    <div class="stat-sub">Active token</div>
+                </div>
+                <div class="stat-card teal-accent">
+                    <div class="stat-label">Waiting in Queue</div>
+                    <div class="stat-value" id="totalWaiting">0</div>
+                    <div class="stat-sub">Tokens ahead</div>
+                </div>
+                <div class="stat-card green-accent">
+                    <div class="stat-label">Completed Today</div>
+                    <div class="stat-value" id="totalCompleted">0</div>
+                    <div class="stat-sub">Served today</div>
+                </div>
+            </div>
+
+            <!-- Content Grid -->
+            <div class="content-grid">
+
+                <!-- Left: Action + Live Tracking -->
+                <div style="display:flex;flex-direction:column;gap:16px;">
+
+                    <!-- Next Token Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-icon blue">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="card-title">Currently Serving</div>
+                                <div class="card-sub">Call the next customer</div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="serving-block">
+                                <div class="serving-label-sm">Token Number</div>
+                                <div class="serving-big" id="currentToken">---</div>
+                                <div class="serving-sub-text">Now serving this customer</div>
+                            </div>
+                            <button id="nextBtn" class="btn-next">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
+                                </svg>
+                                Next Token
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Live Tracking Card -->
+                    <div class="card" id="liveTrackingSection" style="display:none;">
+                        <div class="card-header">
+                            <div class="card-icon amber">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="card-title">People Counter</div>
+                                <div class="card-sub">ESP32 dual ultrasonic sensors</div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="tracking-active-pill">
+                                <span></span>
+                                Tracking Active
+                            </div>
+                            <div class="sensor-block">
+                                <div class="sensor-big" id="sensorValue">0</div>
+                                <div class="sensor-label">People currently in counter area</div>
+                                <div class="sensor-badges">
+                                    <span class="sensor-badge-entry">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>
+                                        Entry +1
+                                    </span>
+                                    <span class="sensor-badge-exit">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                                        Exit −1
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="last-update-text">Last updated: <strong id="lastUpdate">Never</strong></div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right: Queue List -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon teal">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="card-title">Waiting Queue</div>
+                            <div class="card-sub">Upcoming tokens in line</div>
+                        </div>
+                    </div>
+                    <div class="card-body" style="padding-top:4px;">
+                        <div id="queueList">
+                            <div class="queue-empty">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                </svg>
+                                <p>No tokens in queue</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Mirror currentToken (large display) → stat card, and staffName → topbar badge + avatar
+        const _ctEl  = document.getElementById('currentToken');
+        const _ctSEl = document.getElementById('currentTokenStat');
+        const _snEl  = document.getElementById('staffName');
+        const _sbEl  = document.getElementById('staffBadgeName');
+        const _avEl  = document.getElementById('staffAvatar');
+
+        const _ctObs = new MutationObserver(() => {
+            if (_ctSEl) _ctSEl.textContent = _ctEl.textContent;
+        });
+        _ctObs.observe(_ctEl, { childList: true, characterData: true, subtree: true });
+
+        const _snObs = new MutationObserver(() => {
+            const n = _snEl.textContent.trim();
+            if (_sbEl) _sbEl.textContent = n || 'Staff Member';
+            if (_avEl && n) _avEl.textContent = n.charAt(0).toUpperCase();
+        });
+        _snObs.observe(_snEl, { childList: true, characterData: true, subtree: true });
+    </script>
+
+    <script src="js/staff-dashboard.js"></script>
+</body>
+</html>

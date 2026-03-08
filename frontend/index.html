@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Portal — QueuePro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ─── Reset & Variables ─────────────────────────────────────── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --corp-navy:    #0f172a;
+            --corp-blue:    #1d4ed8;
+            --corp-blue-lt: #3b82f6;
+            --corp-teal:    #0d9488;
+            --corp-teal-lt: #14b8a6;
+            --corp-red:     #dc2626;
+            --corp-amber:   #d97706;
+            --corp-green:   #16a34a;
+            --slate-50:     #f8fafc;
+            --slate-100:    #f1f5f9;
+            --slate-200:    #e2e8f0;
+            --slate-300:    #cbd5e1;
+            --slate-400:    #94a3b8;
+            --slate-500:    #64748b;
+            --slate-600:    #475569;
+            --slate-700:    #334155;
+            --white:        #ffffff;
+            --radius:       10px;
+            --radius-lg:    14px;
+            --shadow-sm:    0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+            --shadow:       0 4px 12px rgba(0,0,0,.08);
+            --shadow-lg:    0 10px 25px rgba(0,0,0,.12), 0 4px 10px rgba(0,0,0,.08);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--slate-100);
+            color: var(--corp-navy);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ─── Header ────────────────────────────────────────────────── */
+        .cp-header {
+            background: var(--corp-navy);
+            border-bottom: 1px solid rgba(255,255,255,.08);
+            position: sticky; top: 0; z-index: 50;
+            box-shadow: 0 2px 12px rgba(0,0,0,.25);
+        }
+        .cp-header-inner {
+            max-width: 1200px; margin: 0 auto;
+            padding: 0 32px; height: 64px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .cp-brand {
+            display: flex; align-items: center; gap: 12px;
+        }
+        .cp-brand-icon {
+            width: 38px; height: 38px;
+            background: linear-gradient(135deg, var(--corp-blue), var(--corp-teal));
+            border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .cp-brand-icon svg { width: 20px; height: 20px; color: #fff; }
+        .cp-brand-text h1 { font-size: 16px; font-weight: 700; color: #fff; }
+        .cp-brand-text p  { font-size: 11px; color: var(--slate-400); font-weight: 400; letter-spacing: .4px; }
+
+        .cp-auth-area { display: flex; align-items: center; gap: 12px; }
+        .cp-welcome {
+            font-size: 13px; font-weight: 500; color: var(--slate-300);
+        }
+        .cp-auth-btn {
+            display: inline-flex; align-items: center; gap: 7px;
+            padding: 7px 16px;
+            background: rgba(255,255,255,.08);
+            border: 1px solid rgba(255,255,255,.12);
+            border-radius: 8px;
+            color: #fff; font-size: 13px; font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            text-decoration: none;
+            transition: background .15s, border-color .15s;
+        }
+        .cp-auth-btn:hover {
+            background: rgba(255,255,255,.14);
+            border-color: rgba(255,255,255,.22);
+        }
+        .cp-auth-btn svg { width: 15px; height: 15px; }
+
+        /* ─── Main Content ───────────────────────────────────────────── */
+        .cp-main {
+            flex: 1;
+            max-width: 1200px; width: 100%;
+            margin: 0 auto; padding: 32px;
+        }
+
+        /* ─── Step Header ────────────────────────────────────────────── */
+        .step-header { margin-bottom: 24px; }
+        .step-header h2 { font-size: 22px; font-weight: 800; color: var(--corp-navy); }
+        .step-header p  { font-size: 13.5px; color: var(--slate-500); margin-top: 4px; }
+
+        /* ─── Staff Grid ─────────────────────────────────────────────── */
+        #staffGrid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 16px;
+        }
+
+        .staff-card {
+            background: var(--white);
+            border: 1.5px solid var(--slate-200);
+            border-radius: var(--radius-lg);
+            padding: 22px;
+            cursor: pointer;
+            transition: border-color .18s, box-shadow .18s, transform .18s;
+            display: flex; flex-direction: column; gap: 14px;
+            box-shadow: var(--shadow-sm);
+        }
+        .staff-card:hover {
+            border-color: var(--corp-blue);
+            box-shadow: 0 0 0 3px rgba(29,78,216,.1), var(--shadow);
+            transform: translateY(-2px);
+        }
+
+        .staff-card-top { display: flex; align-items: center; gap: 14px; }
+        .staff-avatar {
+            width: 46px; height: 46px;
+            background: linear-gradient(135deg, var(--corp-blue), var(--corp-teal));
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; font-weight: 800; color: #fff;
+            flex-shrink: 0;
+        }
+        .staff-info h3 { font-size: 15px; font-weight: 700; color: var(--corp-navy); }
+        .staff-info p  { font-size: 12px; color: var(--slate-500); margin-top: 2px; }
+
+        .staff-card-meta { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .meta-chip {
+            display: inline-flex; align-items: center; gap: 5px;
+            background: var(--slate-100); border-radius: 6px;
+            padding: 4px 10px; font-size: 12px; font-weight: 500; color: var(--slate-600);
+        }
+        .meta-chip svg { width: 12px; height: 12px; color: var(--slate-400); }
+        .meta-chip.active-chip { background: rgba(22,163,74,.1); color: #15803d; }
+        .meta-chip.active-chip svg { color: #16a34a; }
+
+        .staff-card-footer {
+            display: flex; align-items: center; justify-content: space-between;
+            padding-top: 12px;
+            border-top: 1px solid var(--slate-100);
+        }
+        .select-counter-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: linear-gradient(135deg, var(--corp-blue), #2563eb);
+            color: #fff; border: none;
+            padding: 7px 14px; border-radius: 7px;
+            font-size: 12.5px; font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer; transition: all .15s;
+        }
+        .select-counter-btn svg { width: 13px; height: 13px; }
+        .select-counter-btn:hover { box-shadow: 0 4px 12px rgba(29,78,216,.35); transform: translateY(-1px); }
+
+        /* Loading / empty state */
+        .loading-state {
+            grid-column: 1 / -1;
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; gap: 12px;
+            padding: 60px 0;
+            background: var(--white);
+            border: 1.5px dashed var(--slate-200);
+            border-radius: var(--radius-lg);
+        }
+        .loading-state svg { width: 36px; height: 36px; color: var(--slate-300); }
+        .loading-state p { font-size: 14px; color: var(--slate-500); }
+
+        /* ─── Booking Section ────────────────────────────────────────── */
+        .back-btn {
+            display: inline-flex; align-items: center; gap: 7px;
+            background: var(--white); border: 1.5px solid var(--slate-200);
+            color: var(--slate-700); border-radius: 8px;
+            padding: 8px 16px; font-size: 13px; font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer; margin-bottom: 20px;
+            transition: background .15s, border-color .15s;
+        }
+        .back-btn:hover { background: var(--slate-50); border-color: var(--slate-300); }
+        .back-btn svg { width: 15px; height: 15px; }
+
+        .booking-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.4fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        /* ─── Card ───────────────────────────────────────────────────── */
+        .cp-card {
+            background: var(--white);
+            border: 1px solid var(--slate-200);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+        .cp-card-header {
+            padding: 18px 22px;
+            border-bottom: 1px solid var(--slate-100);
+            display: flex; align-items: center; gap: 12px;
+        }
+        .cp-card-icon {
+            width: 36px; height: 36px; border-radius: 9px;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .cp-card-icon.blue  { background: rgba(29,78,216,.1);  color: var(--corp-blue); }
+        .cp-card-icon.teal  { background: rgba(13,148,136,.1); color: var(--corp-teal); }
+        .cp-card-icon.green { background: rgba(22,163,74,.1);  color: var(--corp-green); }
+        .cp-card-icon svg { width: 18px; height: 18px; }
+        .cp-card-title { font-size: 14px; font-weight: 700; color: var(--corp-navy); }
+        .cp-card-sub   { font-size: 12px; color: var(--slate-500); margin-top: 1px; }
+        .cp-card-body  { padding: 22px; }
+
+        /* Counter info panel */
+        .serving-block {
+            background: linear-gradient(135deg, var(--corp-navy), #1e293b);
+            border-radius: 10px; padding: 20px;
+            text-align: center; margin-bottom: 16px;
+        }
+        .serving-label { font-size: 11px; font-weight: 600; color: var(--slate-400); text-transform: uppercase; letter-spacing: .7px; }
+        .serving-number {
+            font-size: 52px; font-weight: 800; color: #fff;
+            line-height: 1.1; margin: 6px 0 4px;
+        }
+        .serving-sub { font-size: 12px; color: var(--slate-400); }
+
+        .queue-stat-row {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 16px;
+            background: var(--slate-50);
+            border: 1px solid var(--slate-200);
+            border-radius: 9px;
+        }
+        .queue-stat-row svg { width: 18px; height: 18px; color: var(--corp-blue); flex-shrink: 0; }
+        .queue-stat-value { font-size: 22px; font-weight: 800; color: var(--corp-navy); }
+        .queue-stat-label { font-size: 12px; color: var(--slate-500); }
+
+        /* Booking form */
+        .form-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+        .form-label { font-size: 12.5px; font-weight: 600; color: var(--slate-700); }
+        .form-label span { color: var(--corp-blue); }
+        .form-hint { font-size: 11.5px; color: var(--slate-400); margin-top: -3px; }
+        .form-input {
+            height: 44px; border: 1.5px solid var(--slate-200);
+            border-radius: 8px; padding: 0 14px;
+            font-size: 13.5px; font-family: 'Inter', sans-serif;
+            color: var(--corp-navy); background: var(--white);
+            transition: border-color .2s, box-shadow .2s; outline: none;
+        }
+        .form-input::placeholder { color: var(--slate-400); }
+        .form-input:focus { border-color: var(--corp-blue); box-shadow: 0 0 0 3px rgba(29,78,216,.12); }
+        .form-input:read-only { background: var(--slate-50); color: var(--slate-500); cursor: not-allowed; }
+
+        .btn-get-token {
+            width: 100%; height: 48px;
+            background: linear-gradient(135deg, var(--corp-blue), #2563eb);
+            color: #fff; border: none; border-radius: 10px;
+            font-size: 15px; font-weight: 700; font-family: 'Inter', sans-serif;
+            cursor: pointer; margin-top: 6px;
+            display: flex; align-items: center; justify-content: center; gap: 9px;
+            transition: all .2s;
+            box-shadow: 0 3px 10px rgba(29,78,216,.3);
+        }
+        .btn-get-token svg { width: 18px; height: 18px; }
+        .btn-get-token:hover { box-shadow: 0 6px 18px rgba(29,78,216,.4); transform: translateY(-1px); }
+        .btn-get-token:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+        /* ─── Token Display ──────────────────────────────────────────── */
+        .token-grid {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .token-huge-block {
+            text-align: center; padding: 36px 22px;
+            background: linear-gradient(135deg, var(--corp-navy), #1e293b);
+            border-radius: 16px; margin-bottom: 20px;
+        }
+        .token-label-sm { font-size: 11px; font-weight: 600; color: var(--slate-400); text-transform: uppercase; letter-spacing: .8px; }
+        .token-big-number {
+            font-size: 80px; font-weight: 900; color: #fff;
+            line-height: 1; margin: 8px 0 6px;
+            text-shadow: 0 4px 20px rgba(29,78,216,.5);
+        }
+        .token-counter-tag {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(255,255,255,.1);
+            border: 1px solid rgba(255,255,255,.15);
+            border-radius: 20px; padding: 4px 14px;
+            font-size: 13px; font-weight: 600; color: var(--slate-200);
+        }
+
+        .token-status-box {
+            border-radius: 10px; padding: 14px 18px;
+            display: flex; align-items: center; gap: 14px;
+            margin-bottom: 16px;
+        }
+        .token-status-box.waiting  { background: rgba(217,119,6,.08);  border: 1px solid rgba(217,119,6,.2); }
+        .token-status-box.serving  { background: rgba(22,163,74,.08);  border: 1px solid rgba(22,163,74,.2); }
+        .token-status-box.done     { background: rgba(29,78,216,.08);  border: 1px solid rgba(29,78,216,.15); }
+        .token-status-box svg { width: 24px; height: 24px; flex-shrink: 0; }
+        .token-status-box.waiting svg { color: var(--corp-amber); }
+        .token-status-box.serving svg { color: var(--corp-green); }
+        .token-status-title { font-size: 14px; font-weight: 700; color: var(--corp-navy); }
+        .token-status-msg   { font-size: 12.5px; color: var(--slate-500); margin-top: 2px; }
+
+        .btn-new-token {
+            width: 100%; height: 44px;
+            background: var(--white);
+            border: 1.5px solid var(--slate-200);
+            border-radius: 9px; color: var(--slate-700);
+            font-size: 13.5px; font-weight: 600; font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            transition: all .15s;
+        }
+        .btn-new-token svg { width: 15px; height: 15px; }
+        .btn-new-token:hover { background: var(--slate-50); border-color: var(--slate-300); }
+
+        .btn-cancel-token {
+            position: absolute; top: 18px; right: 18px;
+            background: rgba(220,38,38,.08); border: 1px solid rgba(220,38,38,.15);
+            color: var(--corp-red); border-radius: 7px;
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all .15s;
+        }
+        .btn-cancel-token:hover { background: rgba(220,38,38,.14); }
+        .btn-cancel-token svg { width: 14px; height: 14px; }
+
+        /* Queue info sidebar */
+        .info-row {
+            display: flex; align-items: center; gap: 12px;
+            padding: 14px 16px;
+            background: var(--slate-50);
+            border: 1px solid var(--slate-200);
+            border-radius: 9px; margin-bottom: 10px;
+        }
+        .info-row-icon {
+            width: 36px; height: 36px; border-radius: 9px;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .info-row-icon.blue  { background: rgba(29,78,216,.1);  color: var(--corp-blue); }
+        .info-row-icon.teal  { background: rgba(13,148,136,.1); color: var(--corp-teal); }
+        .info-row-icon svg { width: 17px; height: 17px; }
+        .info-row-label { font-size: 11.5px; color: var(--slate-500); font-weight: 500; }
+        .info-row-value { font-size: 20px; font-weight: 800; color: var(--corp-navy); }
+        .info-row-value.teal { color: var(--corp-teal); }
+
+        .tips-box {
+            background: rgba(29,78,216,.05);
+            border: 1px solid rgba(29,78,216,.12);
+            border-left: 3px solid var(--corp-blue);
+            border-radius: 9px; padding: 14px 16px;
+        }
+        .tips-box h4 { font-size: 12.5px; font-weight: 700; color: var(--corp-navy); margin-bottom: 8px; }
+        .tips-box ul { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+        .tips-box ul li { font-size: 12px; color: var(--slate-600); padding-left: 14px; position: relative; }
+        .tips-box ul li::before { content: '→'; position: absolute; left: 0; color: var(--corp-blue); font-weight: 700; }
+
+        /* ─── Footer ─────────────────────────────────────────────────── */
+        .cp-footer {
+            background: var(--corp-navy);
+            border-top: 1px solid rgba(255,255,255,.06);
+            padding: 18px 32px;
+        }
+        .cp-footer-inner {
+            max-width: 1200px; margin: 0 auto;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 16px;
+        }
+        .cp-footer-links { display: flex; align-items: center; gap: 20px; }
+        .cp-footer-link {
+            display: flex; align-items: center; gap: 6px;
+            color: var(--slate-400); font-size: 13px; font-weight: 500;
+            text-decoration: none; transition: color .15s;
+        }
+        .cp-footer-link:hover { color: var(--slate-200); }
+        .cp-footer-link svg { width: 14px; height: 14px; }
+        .cp-footer-sep { width: 1px; height: 16px; background: rgba(255,255,255,.1); }
+        .cp-footer-copy { font-size: 12px; color: var(--slate-600); }
+
+        /* ─── Positioning util ───────────────────────────────────────── */
+        .rel { position: relative; }
+
+        /* ─── Responsive ─────────────────────────────────────────────── */
+        @media (max-width: 900px) {
+            .booking-grid, .token-grid { grid-template-columns: 1fr; }
+            .cp-main { padding: 20px; }
+        }
+        @media (max-width: 600px) {
+            .cp-header-inner { padding: 0 16px; }
+            .cp-main { padding: 14px; }
+            .cp-brand-text p { display: none; }
+            .token-big-number { font-size: 60px; }
+            .cp-footer-inner { flex-direction: column; align-items: flex-start; gap: 8px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ════════════════════════════ HEADER ═════════════════════════════ -->
+    <header class="cp-header">
+        <div class="cp-header-inner">
+            <div class="cp-brand">
+                <div class="cp-brand-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    </svg>
+                </div>
+                <div class="cp-brand-text">
+                    <h1>QueuePro</h1>
+                    <p>Skip the wait, not the service</p>
+                </div>
+            </div>
+            <div class="cp-auth-area">
+                <span id="customerWelcome" class="cp-welcome"></span>
+                <a href="customer-auth.html" id="authLink" class="cp-auth-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                    Login / Register
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- ════════════════════════════ MAIN ═══════════════════════════════ -->
+    <main class="cp-main">
+
+        <!-- ── STEP 1: Staff / Counter Selection ─────────────────────── -->
+        <section id="staffSelectionSection" class="customer-section">
+            <div class="step-header">
+                <h2>Available Service Counters</h2>
+                <p>Choose your preferred counter to get started</p>
+            </div>
+            <div id="staffGrid">
+                <div class="loading-state">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z"/>
+                    </svg>
+                    <p>Loading available counters...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── STEP 2: Token Booking ──────────────────────────────────── -->
+        <section id="bookingSection" class="customer-section" style="display: none;">
+            <button id="backBtn" class="back-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+                </svg>
+                Back to Counter Selection
+            </button>
+
+            <div class="booking-grid">
+                <!-- Left: Counter Info -->
+                <div class="cp-card">
+                    <div class="cp-card-header">
+                        <div class="cp-card-icon blue">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="cp-card-title">Counter: <span id="selectedStaffName">--</span></div>
+                            <div class="cp-card-sub">Live queue information</div>
+                        </div>
+                    </div>
+                    <div class="cp-card-body">
+                        <div class="serving-block">
+                            <div class="serving-label">Currently Serving</div>
+                            <div class="serving-number" id="currentServingToken">--</div>
+                            <div class="serving-sub">Active token</div>
+                        </div>
+                        <div class="queue-stat-row">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0"/>
+                            </svg>
+                            <div>
+                                <div class="queue-stat-value" id="waitingCount">0</div>
+                                <div class="queue-stat-label">Waiting in Queue</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Booking Form -->
+                <div class="cp-card">
+                    <div class="cp-card-header">
+                        <div class="cp-card-icon teal">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="cp-card-title">Get Your Token</div>
+                            <div class="cp-card-sub">Fill in your details to join the queue</div>
+                        </div>
+                    </div>
+                    <div class="cp-card-body">
+                        <form id="bookingForm">
+                            <div class="form-field">
+                                <label class="form-label" for="customerName">Full Name <span>*</span></label>
+                                <input class="form-input" type="text" id="customerName" placeholder="Enter your full name" maxlength="100" required>
+                            </div>
+                            <div class="form-field">
+                                <label class="form-label" for="customerPhone">Phone Number <span>*</span></label>
+                                <input class="form-input" type="tel" id="customerPhone" placeholder="Enter 10-digit mobile number" pattern="[0-9]{10}" maxlength="10" required>
+                                <span class="form-hint">We'll use this to notify you</span>
+                            </div>
+                            <button type="submit" class="btn-get-token">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                                </svg>
+                                Get My Token
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── STEP 3: Token Display ──────────────────────────────────── -->
+        <section id="tokenDisplaySection" class="customer-section" style="display: none;">
+            <div class="token-grid">
+                <!-- Main Token Card -->
+                <div class="cp-card rel">
+                    <button id="cancelTokenBtn" class="btn-cancel-token" title="Cancel Token">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+
+                    <div class="cp-card-body">
+                        <div class="token-huge-block">
+                            <div class="token-label-sm">Your Token Number</div>
+                            <div class="token-big-number" id="yourTokenNumber">--</div>
+                            <div class="token-counter-tag">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                </svg>
+                                Counter: <span id="tokenStaffName">--</span>
+                            </div>
+                        </div>
+
+                        <!-- Status (JS updates this div) -->
+                        <div id="tokenStatus">
+                            <div class="token-status-box waiting">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <div>
+                                    <div class="token-status-title">Please Wait</div>
+                                    <div class="token-status-msg" id="statusMessage">Your turn will come soon</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button id="newTokenBtn" class="btn-new-token">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            Get Another Token
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Queue Info Sidebar -->
+                <div style="display:flex;flex-direction:column;gap:14px;">
+                    <div class="cp-card">
+                        <div class="cp-card-header">
+                            <div class="cp-card-icon blue">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="cp-card-title">Queue Information</div>
+                                <div class="cp-card-sub">Live updates every 3 seconds</div>
+                            </div>
+                        </div>
+                        <div class="cp-card-body" style="padding-top:16px;">
+                            <div class="info-row">
+                                <div class="info-row-icon blue">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="info-row-label">Currently Serving</div>
+                                    <div class="info-row-value" id="displayCurrentServing">--</div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-row-icon teal">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="info-row-label">Tokens Ahead of You</div>
+                                    <div class="info-row-value teal" id="tokensAhead">--</div>
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-row-icon" style="color: #7c3aed;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="info-row-label">Estimated Wait Time</div>
+                                    <div class="info-row-value" style="color: #7c3aed;" id="estimatedTime">Calculating...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tips-box">
+                        <h4>Stay Informed</h4>
+                        <ul>
+                            <li>Keep this page open for real-time updates</li>
+                            <li>You'll receive alerts when your turn approaches</li>
+                            <li>Be ready when your token is called</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ════════════════════════════ FOOTER ═════════════════════════════ -->
+    <footer class="cp-footer">
+        <div class="cp-footer-inner">
+            <div class="cp-footer-links">
+                <a href="customer-auth.html" class="cp-footer-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                    Customer Portal
+                </a>
+                <div class="cp-footer-sep"></div>
+                <a href="login.html" class="cp-footer-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    </svg>
+                    Staff / Admin Login
+                </a>
+            </div>
+            <div class="cp-footer-copy">© 2026 QueuePro. All rights reserved.</div>
+        </div>
+    </footer>
+
+    <script src="js/customer-portal.js"></script>
+</body>
+</html>

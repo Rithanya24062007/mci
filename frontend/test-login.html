@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Login Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 40px; max-width: 400px; margin: 0 auto; }
+        .field { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #1d4ed8; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:disabled { background: #94a3b8; cursor: not-allowed; }
+        .error { background: #fee; border: 1px solid #f00; padding: 10px; border-radius: 4px; color: #c00; margin-bottom: 15px; display: none; }
+        .error.show { display: block; }
+        .success { background: #efe; border: 1px solid #0c0; padding: 10px; border-radius: 4px; color: #060; margin-bottom: 15px; display: none; }
+        .success.show { display: block; }
+        .debug { background: #f5f5f5; padding: 10px; border-radius: 4px; margin-top: 20px; font-size: 12px; max-height: 300px; overflow: auto; }
+        pre { margin: 0; white-space: pre-wrap; word-wrap: break-word; }
+    </style>
+</head>
+<body>
+    <h2>Login Test Page</h2>
+    
+    <div id="errorBox" class="error"></div>
+    <div id="successBox" class="success"></div>
+    
+    <form id="testForm">
+        <div class="field">
+            <label>Email:</label>
+            <input type="email" id="email" value="admin@queuepro.com" required>
+        </div>
+        <div class="field">
+            <label>Password:</label>
+            <input type="password" id="password" value="admin123" required>
+        </div>
+        <button type="submit" id="loginBtn">Login</button>
+    </form>
+    
+    <div class="debug">
+        <strong>Debug Console:</strong>
+        <pre id="debugLog"></pre>
+    </div>
+    
+    <script>
+        const API_BASE_URL = 'http://localhost:3000';
+        const debugLog = document.getElementById('debugLog');
+        const errorBox = document.getElementById('errorBox');
+        const successBox = document.getElementById('successBox');
+        
+        function log(msg) {
+            console.log(msg);
+            debugLog.textContent += msg + '\n';
+        }
+        
+        function showError(msg) {
+            errorBox.textContent = msg;
+            errorBox.classList.add('show');
+            successBox.classList.remove('show');
+        }
+        
+        function showSuccess(msg) {
+            successBox.textContent = msg;
+            successBox.classList.add('show');
+            errorBox.classList.remove('show');
+        }
+        
+        log('Page loaded - JavaScript is working!');
+        log('API URL: ' + API_BASE_URL);
+        
+        document.getElementById('testForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            log('\n--- Login attempt started ---');
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            
+            log('Email: ' + email);
+            log('Password: ' + password.replace(/./g, '*'));
+            
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Logging in...';
+            errorBox.classList.remove('show');
+            successBox.classList.remove('show');
+            
+            try {
+                log('Sending request to: ' + API_BASE_URL + '/login');
+                
+                const response = await fetch(API_BASE_URL + '/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                log('Response status: ' + response.status + ' ' + response.statusText);
+                
+                const data = await response.json();
+                log('Response data: ' + JSON.stringify(data, null, 2));
+                
+                if (response.ok) {
+                    showSuccess('✓ Login successful!');
+                    log('✓ SUCCESS! Storing data to localStorage...');
+                    
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('role', data.role);
+                    localStorage.setItem('userId', data.userId.toString());
+                    localStorage.setItem('userName', data.name);
+                    
+                    log('Stored token: ' + (localStorage.getItem('token') ? 'YES' : 'NO'));
+                    log('Stored role: ' + localStorage.getItem('role'));
+                    log('Stored userName: ' + localStorage.getItem('userName'));
+                    
+                    log('\nRedirecting in 2 seconds...');
+                    setTimeout(() => {
+                        if (data.role === 'admin') {
+                            log('Going to: admin-dashboard.html');
+                            window.location.href = 'admin-dashboard.html';
+                        } else {
+                            log('Going to: staff-dashboard.html');
+                            window.location.href = 'staff-dashboard.html';
+                        }
+                    }, 2000);
+                } else {
+                    showError('✗ ' + (data.error || 'Login failed'));
+                    log('✗ FAILED: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                showError('✗ Network error: ' + error.message);
+                log('✗ EXCEPTION: ' + error.message);
+                log(error.stack);
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Login';
+            }
+        });
+        
+        log('Event listener attached to form');
+    </script>
+</body>
+</html>

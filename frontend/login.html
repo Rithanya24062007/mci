@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff & Admin Login - Queue Management System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ===== CORPORATE STAFF/ADMIN LOGIN - STANDALONE STYLES ===== */
+        :root {
+            --corp-navy: #0f172a;
+            --corp-slate: #1e293b;
+            --corp-blue: #1d4ed8;
+            --corp-blue-hover: #2563eb;
+            --corp-teal: #0d9488;
+            --corp-teal-light: #14b8a6;
+            --corp-gray-50: #f8fafc;
+            --corp-gray-100: #f1f5f9;
+            --corp-gray-200: #e2e8f0;
+            --corp-gray-300: #cbd5e1;
+            --corp-gray-400: #94a3b8;
+            --corp-gray-500: #64748b;
+            --corp-gray-600: #475569;
+            --corp-gray-700: #334155;
+            --corp-gray-800: #1e293b;
+            --corp-white: #ffffff;
+            --corp-red: #dc2626;
+            --corp-red-bg: #fef2f2;
+            --corp-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --corp-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--corp-gray-100);
+            color: var(--corp-gray-700);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .auth-page {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ===== LEFT PANEL - BRANDING ===== */
+        .auth-branding {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 45%;
+            background: linear-gradient(160deg, #020617 0%, var(--corp-navy) 45%, #0f2233 100%);
+            padding: 4rem 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-branding::before {
+            content: '';
+            position: absolute;
+            top: -20%;
+            right: -15%;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: rgba(29, 78, 216, 0.07);
+        }
+
+        .auth-branding::after {
+            content: '';
+            position: absolute;
+            bottom: -20%;
+            left: -10%;
+            width: 350px;
+            height: 350px;
+            border-radius: 50%;
+            background: rgba(13, 148, 136, 0.05);
+        }
+
+        /* Grid decorative lines */
+        .auth-branding .grid-lines {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        .branding-content {
+            position: relative;
+            z-index: 1;
+            max-width: 420px;
+        }
+
+        .branding-logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 3.5rem;
+        }
+
+        .logo-mark {
+            width: 48px;
+            height: 48px;
+            background: var(--corp-blue);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.375rem;
+            font-weight: 800;
+            color: white;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: -0.05em;
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--corp-white);
+            letter-spacing: -0.02em;
+        }
+
+        .access-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.375rem 0.875rem;
+            background: rgba(29, 78, 216, 0.15);
+            border: 1px solid rgba(29, 78, 216, 0.3);
+            border-radius: 100px;
+            color: #93c5fd;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 1.5rem;
+        }
+
+        .access-badge-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #93c5fd;
+        }
+
+        .branding-headline {
+            font-size: 2.625rem;
+            font-weight: 800;
+            color: var(--corp-white);
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.03em;
+        }
+
+        .branding-headline span {
+            color: var(--corp-teal-light);
+        }
+
+        .branding-description {
+            font-size: 1rem;
+            color: var(--corp-gray-400);
+            line-height: 1.8;
+            margin-bottom: 3rem;
+            border-left: 2px solid rgba(29, 78, 216, 0.4);
+            padding-left: 1.25rem;
+        }
+
+        .branding-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.25rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 1.25rem;
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--corp-white);
+            letter-spacing: -0.03em;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-value span {
+            color: var(--corp-teal-light);
+            font-size: 1.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.8125rem;
+            color: var(--corp-gray-500);
+            font-weight: 500;
+        }
+
+        /* ===== RIGHT PANEL - FORM ===== */
+        .auth-form-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            background: var(--corp-white);
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 420px;
+            animation: fadeSlideIn 0.5s ease forwards;
+        }
+
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Mobile Logo */
+        .mobile-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .mobile-brand .logo-mark {
+            width: 40px;
+            height: 40px;
+            font-size: 1.125rem;
+        }
+
+        .mobile-brand .logo-text {
+            color: var(--corp-navy);
+            font-size: 1.125rem;
+        }
+
+        /* Role Indicator */
+        .role-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 100px;
+            color: var(--corp-blue);
+            font-size: 0.8125rem;
+            font-weight: 600;
+            margin-bottom: 1.75rem;
+        }
+
+        .role-indicator svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Form Header */
+        .form-header {
+            margin-bottom: 2rem;
+        }
+
+        .form-header h1 {
+            font-size: 1.875rem;
+            font-weight: 800;
+            color: var(--corp-navy);
+            letter-spacing: -0.03em;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-header p {
+            font-size: 0.9375rem;
+            color: var(--corp-gray-500);
+        }
+
+        /* Form Styles */
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.375rem;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .field label {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: var(--corp-gray-700);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            color: var(--corp-gray-400);
+            pointer-events: none;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 0.875rem 1rem 0.875rem 2.75rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9375rem;
+            color: var(--corp-gray-800);
+            background: var(--corp-gray-50);
+            border: 1.5px solid var(--corp-gray-200);
+            border-radius: 10px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .input-wrapper input::placeholder {
+            color: var(--corp-gray-400);
+            font-weight: 400;
+        }
+
+        .input-wrapper input:focus {
+            background: var(--corp-white);
+            border-color: var(--corp-blue);
+            box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.1);
+        }
+
+        /* Error Message */
+        .auth-error {
+            padding: 0.875rem 1rem;
+            background: var(--corp-red-bg);
+            border: 1px solid #fecaca;
+            border-radius: 10px;
+            color: var(--corp-red);
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: none;
+            align-items: center;
+            gap: 0.625rem;
+        }
+
+        .auth-error.visible {
+            display: flex;
+        }
+
+        .auth-error svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        /* Submit Button */
+        .btn-submit {
+            width: 100%;
+            padding: 0.9375rem 1.5rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--corp-white);
+            background: var(--corp-blue);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .btn-submit:hover {
+            background: var(--corp-blue-hover);
+            box-shadow: var(--corp-shadow-md);
+            transform: translateY(-1px);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .btn-submit:disabled {
+            background: var(--corp-gray-300);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-submit svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Security Note */
+        .security-note {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1.75rem;
+            padding: 0.875rem 1rem;
+            background: var(--corp-gray-50);
+            border: 1px solid var(--corp-gray-200);
+            border-radius: 10px;
+            color: var(--corp-gray-500);
+            font-size: 0.8125rem;
+        }
+
+        .security-note svg {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+            color: var(--corp-gray-400);
+        }
+
+        /* Divider */
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.75rem 0 1.25rem;
+        }
+
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--corp-gray-200);
+        }
+
+        .auth-divider span {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--corp-gray-400);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        /* Footer */
+        .auth-footer {
+            text-align: center;
+        }
+
+        .auth-footer a {
+            font-size: 0.875rem;
+            color: var(--corp-gray-500);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .auth-footer a:hover {
+            color: var(--corp-blue);
+        }
+
+        .auth-footer a svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (min-width: 1024px) {
+            .auth-branding { display: flex; }
+            .mobile-brand { display: none; }
+        }
+
+        @media (max-width: 480px) {
+            .auth-form-panel { padding: 1.5rem; }
+            .form-header h1 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-page">
+        <!-- Left Branding Panel (Desktop) -->
+        <aside class="auth-branding">
+            <div class="grid-lines"></div>
+            <div class="branding-content">
+                <div class="branding-logo">
+                    <div class="logo-mark">Q</div>
+                    <span class="logo-text">QueuePro</span>
+                </div>
+
+                <div class="access-badge">
+                    <span class="access-badge-dot"></span>
+                    Authorized Personnel Only
+                </div>
+
+                <h2 class="branding-headline">
+                    Manage queues<br>
+                    with <span>precision</span>.
+                </h2>
+
+                <p class="branding-description">
+                    Access the staff and admin control panel to manage counters, monitor queues in real-time, and deliver seamless service operations.
+                </p>
+
+                <div class="branding-stats">
+                    <div class="stat-card">
+                        <div class="stat-value">99<span>%</span></div>
+                        <div class="stat-label">System Uptime</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">3<span>s</span></div>
+                        <div class="stat-label">Live Refresh Rate</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">JWT</div>
+                        <div class="stat-label">Secure Auth</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">24<span>/7</span></div>
+                        <div class="stat-label">Monitoring</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Right Form Panel -->
+        <main class="auth-form-panel">
+            <div class="form-container">
+                <!-- Mobile Brand -->
+                <div class="mobile-brand">
+                    <div class="logo-mark">Q</div>
+                    <span class="logo-text">QueuePro</span>
+                </div>
+
+                <!-- Role Indicator -->
+                <div class="role-indicator">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    Staff &amp; Admin Access
+                </div>
+
+                <!-- Form Header -->
+                <div class="form-header">
+                    <h1>Secure Sign In</h1>
+                    <p>Enter your credentials to access the control panel</p>
+                </div>
+
+                <!-- Login Form -->
+                <form id="loginForm" class="auth-form">
+                    <div class="field">
+                        <label for="email">Email Address</label>
+                        <div class="input-wrapper">
+                            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                placeholder="you@organization.com"
+                                required
+                                autocomplete="email"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="password">Password</label>
+                        <div class="input-wrapper">
+                            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                placeholder="Enter your password"
+                                required
+                                autocomplete="current-password"
+                            >
+                        </div>
+                    </div>
+
+                    <div id="errorMessage" class="auth-error">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                        <span id="errorText"></span>
+                    </div>
+
+                    <button type="submit" class="btn-submit" id="loginBtn">
+                        <span>Sign In to Dashboard</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </button>
+                </form>
+
+                <div class="security-note">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    Your session is protected with JWT authentication
+                </div>
+
+                <div class="auth-divider">
+                    <span>not staff?</span>
+                </div>
+
+                <div class="auth-footer">
+                    <a href="customer-auth.html">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                        Go to Customer Portal
+                    </a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/login.js"></script>
+</body>
+</html>

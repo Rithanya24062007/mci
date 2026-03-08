@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Login - Queue Management System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ===== CORPORATE AUTH PAGE - STANDALONE STYLES ===== */
+        :root {
+            --corp-navy: #0f172a;
+            --corp-slate: #1e293b;
+            --corp-blue: #1d4ed8;
+            --corp-blue-light: #3b82f6;
+            --corp-blue-hover: #2563eb;
+            --corp-teal: #0d9488;
+            --corp-teal-light: #14b8a6;
+            --corp-gray-50: #f8fafc;
+            --corp-gray-100: #f1f5f9;
+            --corp-gray-200: #e2e8f0;
+            --corp-gray-300: #cbd5e1;
+            --corp-gray-400: #94a3b8;
+            --corp-gray-500: #64748b;
+            --corp-gray-600: #475569;
+            --corp-gray-700: #334155;
+            --corp-gray-800: #1e293b;
+            --corp-white: #ffffff;
+            --corp-red: #dc2626;
+            --corp-red-bg: #fef2f2;
+            --corp-green: #16a34a;
+            --corp-green-bg: #f0fdf4;
+            --corp-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --corp-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+            --corp-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            --corp-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            --corp-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--corp-gray-100);
+            color: var(--corp-gray-700);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .auth-page {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ===== LEFT PANEL - BRANDING ===== */
+        .auth-branding {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 45%;
+            background: linear-gradient(160deg, var(--corp-navy) 0%, var(--corp-slate) 50%, #0f2744 100%);
+            padding: 4rem 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-branding::before {
+            content: '';
+            position: absolute;
+            top: -30%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: rgba(29, 78, 216, 0.08);
+        }
+
+        .auth-branding::after {
+            content: '';
+            position: absolute;
+            bottom: -20%;
+            left: -15%;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            background: rgba(13, 148, 136, 0.06);
+        }
+
+        .branding-content {
+            position: relative;
+            z-index: 1;
+            max-width: 420px;
+            text-align: left;
+        }
+
+        .branding-logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+
+        .logo-mark {
+            width: 48px;
+            height: 48px;
+            background: var(--corp-blue);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            font-weight: 800;
+        }
+
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--corp-white);
+            letter-spacing: -0.02em;
+        }
+
+        .branding-headline {
+            font-size: 2.75rem;
+            font-weight: 800;
+            color: var(--corp-white);
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.03em;
+        }
+
+        .branding-headline span {
+            color: var(--corp-teal-light);
+        }
+
+        .branding-description {
+            font-size: 1.125rem;
+            color: var(--corp-gray-400);
+            line-height: 1.8;
+            margin-bottom: 3rem;
+        }
+
+        .branding-features {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .feature-check {
+            width: 28px;
+            height: 28px;
+            background: rgba(13, 148, 136, 0.15);
+            border: 1px solid rgba(13, 148, 136, 0.3);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .feature-check svg {
+            width: 14px;
+            height: 14px;
+            color: var(--corp-teal-light);
+        }
+
+        .feature-text {
+            color: var(--corp-gray-300);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        /* ===== RIGHT PANEL - FORM ===== */
+        .auth-form-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            background: var(--corp-white);
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 440px;
+        }
+
+        /* Mobile Logo */
+        .mobile-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .mobile-brand .logo-mark {
+            width: 40px;
+            height: 40px;
+            font-size: 1.25rem;
+        }
+
+        .mobile-brand .logo-text {
+            color: var(--corp-navy);
+            font-size: 1.125rem;
+        }
+
+        /* Form Header */
+        .form-header {
+            margin-bottom: 2.5rem;
+        }
+
+        .form-header h1 {
+            font-size: 1.875rem;
+            font-weight: 800;
+            color: var(--corp-navy);
+            letter-spacing: -0.03em;
+            margin-bottom: 0.625rem;
+        }
+
+        .form-header p {
+            font-size: 0.95rem;
+            color: var(--corp-gray-500);
+            font-weight: 400;
+        }
+
+        /* Tab Switcher */
+        .auth-tabs {
+            display: flex;
+            background: var(--corp-gray-100);
+            border-radius: 10px;
+            padding: 4px;
+            margin-bottom: 2rem;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            text-align: center;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--corp-gray-500);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.25s ease;
+            border: none;
+            background: none;
+        }
+
+        .auth-tab.active {
+            background: var(--corp-white);
+            color: var(--corp-navy);
+            box-shadow: var(--corp-shadow-sm);
+        }
+
+        .auth-tab:hover:not(.active) {
+            color: var(--corp-gray-700);
+        }
+
+        /* Form Styles */
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.375rem;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .field label {
+            font-size: 0.8125rem;
+            font-weight: 600;
+            color: var(--corp-gray-700);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            color: var(--corp-gray-400);
+            pointer-events: none;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 0.8125rem 1rem 0.8125rem 2.75rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9375rem;
+            color: var(--corp-gray-800);
+            background: var(--corp-gray-50);
+            border: 1.5px solid var(--corp-gray-200);
+            border-radius: 10px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .input-wrapper input::placeholder {
+            color: var(--corp-gray-400);
+            font-weight: 400;
+        }
+
+        .input-wrapper input:focus {
+            background: var(--corp-white);
+            border-color: var(--corp-blue);
+            box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.1);
+        }
+
+        .field-hint {
+            font-size: 0.75rem;
+            color: var(--corp-gray-400);
+            margin-top: 0.125rem;
+        }
+
+        /* Error Message */
+        .auth-error {
+            padding: 0.875rem 1rem;
+            background: var(--corp-red-bg);
+            border: 1px solid #fecaca;
+            border-radius: 10px;
+            color: var(--corp-red);
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: none;
+            align-items: center;
+            gap: 0.625rem;
+        }
+
+        .auth-error.visible {
+            display: flex;
+        }
+
+        .auth-error svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        /* Success Message */
+        .auth-success {
+            padding: 0.875rem 1rem;
+            background: var(--corp-green-bg);
+            border: 1px solid #bbf7d0;
+            border-radius: 10px;
+            color: var(--corp-green);
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: none;
+            align-items: center;
+            gap: 0.625rem;
+        }
+
+        .auth-success.visible {
+            display: flex;
+        }
+
+        /* Submit Button */
+        .btn-submit {
+            width: 100%;
+            padding: 0.9375rem 1.5rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--corp-white);
+            background: var(--corp-blue);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .btn-submit:hover {
+            background: var(--corp-blue-hover);
+            box-shadow: var(--corp-shadow-md);
+            transform: translateY(-1px);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .btn-submit:disabled {
+            background: var(--corp-gray-300);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-submit svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* Divider */
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--corp-gray-200);
+        }
+
+        .auth-divider span {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--corp-gray-400);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        /* Footer */
+        .auth-footer {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .auth-footer a {
+            font-size: 0.875rem;
+            color: var(--corp-gray-500);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .auth-footer a:hover {
+            color: var(--corp-blue);
+        }
+
+        .auth-footer a svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (min-width: 1024px) {
+            .auth-branding {
+                display: flex;
+            }
+
+            .mobile-brand {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .auth-form-panel {
+                padding: 1.5rem;
+            }
+
+            .form-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .branding-headline {
+                font-size: 2rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-container {
+            animation: fadeSlideIn 0.5s ease forwards;
+        }
+
+        .auth-form {
+            animation: fadeSlideIn 0.5s ease 0.1s forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-page">
+        <!-- Left Branding Panel (Desktop) -->
+        <aside class="auth-branding">
+            <div class="branding-content">
+                <div class="branding-logo">
+                    <div class="logo-mark">Q</div>
+                    <span class="logo-text">QueuePro</span>
+                </div>
+                
+                <h2 class="branding-headline">
+                    Skip the wait,<br>
+                    not the <span>service</span>.
+                </h2>
+
+                <p class="branding-description">
+                    Join thousands of customers who save time with our intelligent queue management system. Book your token online and arrive when it's your turn.
+                </p>
+
+                <div class="branding-features">
+                    <div class="feature-item">
+                        <div class="feature-check">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        </div>
+                        <span class="feature-text">Real-time queue position updates</span>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-check">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        </div>
+                        <span class="feature-text">Instant alerts when your turn arrives</span>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-check">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        </div>
+                        <span class="feature-text">Book tokens from any device</span>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-check">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        </div>
+                        <span class="feature-text">Secure & private — your data is safe</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Right Form Panel -->
+        <main class="auth-form-panel">
+            <div class="form-container">
+                <!-- Mobile Brand -->
+                <div class="mobile-brand">
+                    <div class="logo-mark">Q</div>
+                    <span class="logo-text">QueuePro</span>
+                </div>
+
+                <!-- Form Header -->
+                <div class="form-header">
+                    <h1 id="formTitle">Welcome back</h1>
+                    <p id="formSubtitle">Sign in to your account to continue</p>
+                </div>
+
+                <!-- Tab Switcher -->
+                <div class="auth-tabs">
+                    <button class="auth-tab active" id="tabLogin" type="button">Sign In</button>
+                    <button class="auth-tab" id="tabRegister" type="button">Create Account</button>
+                </div>
+
+                <!-- Login Form -->
+                <form id="loginForm" class="auth-form">
+                    <div class="field">
+                        <label for="loginPhone">Phone Number</label>
+                        <div class="input-wrapper">
+                            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                            <input 
+                                type="tel" 
+                                id="loginPhone" 
+                                name="phone" 
+                                placeholder="Enter your 10-digit number"
+                                pattern="[0-9]{10}"
+                                maxlength="10"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="loginPassword">Password</label>
+                        <div class="input-wrapper">
+                            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            <input 
+                                type="password" 
+                                id="loginPassword" 
+                                name="password" 
+                                placeholder="Enter your password"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div id="loginError" class="auth-error">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                        <span id="loginErrorText"></span>
+                    </div>
+
+                    <button type="submit" class="btn-submit" id="loginBtn">
+                        <span>Sign In</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </button>
+                </form>
+
+                <!-- Registration Form -->
+                <form id="registerForm" class="auth-form" style="display: none;">
+                    <div class="field">
+                        <label for="registerName">Full Name</label>
+                        <div class="input-wrapper">
+                            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            <input 
+                                type="text" 
+                                id="registerName" 
+                                name="name" 
+                                placeholder="John Doe"
+                                required
+                            >
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="registerPhone">Phone Number</label>
+                        <div class="input-wrapper">
+                            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                            <input 
+                                type="tel" 
+                                id="registerPhone" 
+                                name="phone" 
+                                placeholder="Enter 10-digit number"
+                                pattern="[0-9]{10}"
+                                maxlength="10"
+                                required
+                            >
+                        </div>
+                        <span class="field-hint">This will be used as your login ID</span>
+                    </div>
+
+                    <div class="field">
+                        <label for="registerEmail">Email Address <span style="color: var(--corp-gray-400); font-weight: 400; text-transform: none; letter-spacing: 0;">(Optional)</span></label>
+                        <div class="input-wrapper">
+                            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                            <input 
+                                type="email" 
+                                id="registerEmail" 
+                                name="email" 
+                                placeholder="john@example.com"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label for="registerPassword">Password</label>
+                        <div class="input-wrapper">
+                            <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            <input 
+                                type="password" 
+                                id="registerPassword" 
+                                name="password" 
+                                placeholder="Create a secure password"
+                                minlength="6"
+                                required
+                            >
+                        </div>
+                        <span class="field-hint">Must be at least 6 characters</span>
+                    </div>
+
+                    <div id="registerError" class="auth-error">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                        <span id="registerErrorText"></span>
+                    </div>
+
+                    <button type="submit" class="btn-submit" id="registerBtn">
+                        <span>Create Account</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </button>
+                </form>
+
+                <!-- Footer -->
+                <div class="auth-divider">
+                    <span>or</span>
+                </div>
+
+                <div class="auth-footer">
+                    <a href="login.html">
+                        Staff / Admin Portal
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </a>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/customer-auth.js"></script>
+</body>
+</html>

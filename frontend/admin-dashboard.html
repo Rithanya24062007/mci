@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard — QueuePro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ─── Reset & Variables ─────────────────────────────────────────── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --corp-navy:    #0f172a;
+            --corp-navy2:   #1e293b;
+            --corp-blue:    #1d4ed8;
+            --corp-blue-lt: #3b82f6;
+            --corp-teal:    #0d9488;
+            --corp-red:     #dc2626;
+            --corp-amber:   #d97706;
+            --corp-green:   #16a34a;
+            --slate-50:     #f8fafc;
+            --slate-100:    #f1f5f9;
+            --slate-200:    #e2e8f0;
+            --slate-300:    #cbd5e1;
+            --slate-400:    #94a3b8;
+            --slate-500:    #64748b;
+            --slate-600:    #475569;
+            --slate-700:    #334155;
+            --white:        #ffffff;
+            --sidebar-w:    260px;
+            --header-h:     64px;
+            --radius:       10px;
+            --radius-lg:    14px;
+            --shadow-sm:    0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+            --shadow:       0 4px 6px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.06);
+            --shadow-lg:    0 10px 25px rgba(0,0,0,.12), 0 4px 10px rgba(0,0,0,.08);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--slate-100);
+            color: var(--corp-navy);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* ─── Sidebar ──────────────────────────────────────────────────── */
+        .sidebar {
+            width: var(--sidebar-w);
+            background: var(--corp-navy);
+            min-height: 100vh;
+            position: fixed; left: 0; top: 0;
+            display: flex; flex-direction: column;
+            z-index: 100; overflow-y: auto;
+        }
+        .sidebar-brand {
+            display: flex; align-items: center; gap: 12px;
+            padding: 20px 22px;
+            border-bottom: 1px solid rgba(255,255,255,.08);
+        }
+        .sidebar-brand-icon {
+            width: 38px; height: 38px;
+            background: linear-gradient(135deg, var(--corp-blue), var(--corp-teal));
+            border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .sidebar-brand-icon svg { width: 20px; height: 20px; color: #fff; }
+        .sidebar-brand-text h2 { font-size: 15px; font-weight: 700; color: #fff; line-height: 1.2; }
+        .sidebar-brand-text span { font-size: 11px; color: var(--slate-400); font-weight: 400; letter-spacing: .6px; text-transform: uppercase; }
+        .sidebar-nav { padding: 18px 12px; flex: 1; }
+        .sidebar-section-label {
+            font-size: 10px; font-weight: 600; color: var(--slate-500);
+            letter-spacing: 1px; text-transform: uppercase;
+            padding: 6px 10px 8px;
+        }
+        .sidebar-link {
+            display: flex; align-items: center; gap: 11px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            color: var(--slate-400);
+            font-size: 13.5px; font-weight: 500;
+            cursor: pointer; margin-bottom: 2px;
+            transition: background .15s, color .15s;
+            border: none; background: none; width: 100%; text-align: left;
+        }
+        .sidebar-link svg { width: 17px; height: 17px; flex-shrink: 0; }
+        .sidebar-link:hover { background: rgba(255,255,255,.06); color: #fff; }
+        .sidebar-link.active { background: rgba(29,78,216,.25); color: var(--corp-blue-lt); }
+        .sidebar-footer { padding: 16px 12px; border-top: 1px solid rgba(255,255,255,.07); }
+        .sidebar-user {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px;
+            background: rgba(255,255,255,.05); border-radius: 9px;
+        }
+        .sidebar-user-avatar {
+            width: 34px; height: 34px;
+            background: linear-gradient(135deg, var(--corp-blue), var(--corp-teal));
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 700; color: #fff; flex-shrink: 0;
+        }
+        .sidebar-user-info { flex: 1; min-width: 0; }
+        .sidebar-user-info strong { display: block; font-size: 12.5px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sidebar-user-info span { font-size: 11px; color: var(--slate-400); }
+        .btn-logout {
+            background: none; border: none; cursor: pointer;
+            color: var(--slate-400); padding: 4px; border-radius: 6px;
+            transition: color .15s, background .15s;
+            display: flex; align-items: center;
+        }
+        .btn-logout:hover { color: var(--corp-red); background: rgba(220,38,38,.1); }
+        .btn-logout svg { width: 17px; height: 17px; }
+
+        /* ─── Main Layout ──────────────────────────────────────────────── */
+        .main-wrapper { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+        .topbar {
+            height: var(--header-h);
+            background: var(--white);
+            border-bottom: 1px solid var(--slate-200);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 32px;
+            position: sticky; top: 0; z-index: 50;
+            box-shadow: var(--shadow-sm);
+        }
+        .topbar-title h1 { font-size: 18px; font-weight: 700; color: var(--corp-navy); }
+        .topbar-title p { font-size: 12.5px; color: var(--slate-500); margin-top: 1px; }
+        .topbar-right { display: flex; align-items: center; gap: 12px; }
+        .admin-badge {
+            display: flex; align-items: center; gap: 8px;
+            background: rgba(29,78,216,.08);
+            border: 1px solid rgba(29,78,216,.15);
+            border-radius: 20px; padding: 5px 12px 5px 8px;
+        }
+        .admin-badge-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--corp-blue); }
+        .admin-badge span { font-size: 12.5px; font-weight: 600; color: var(--corp-blue); }
+        .page-content { padding: 28px 32px; flex: 1; }
+        .dash-section { display: none; }
+        .dash-section.active { display: block; }
+
+        /* ─── Cards ────────────────────────────────────────────────────── */
+        .card {
+            background: var(--white);
+            border: 1px solid var(--slate-200);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 24px; overflow: hidden;
+        }
+        .card-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--slate-100);
+        }
+        .card-header-left { display: flex; align-items: center; gap: 12px; }
+        .card-icon {
+            width: 38px; height: 38px; border-radius: 9px;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .card-icon.blue  { background: rgba(29,78,216,.1);  color: var(--corp-blue); }
+        .card-icon.teal  { background: rgba(13,148,136,.1); color: var(--corp-teal); }
+        .card-icon.amber { background: rgba(217,119,6,.1);  color: var(--corp-amber); }
+        .card-icon svg { width: 19px; height: 19px; }
+        .card-title { font-size: 15px; font-weight: 700; color: var(--corp-navy); }
+        .card-subtitle { font-size: 12px; color: var(--slate-500); margin-top: 2px; }
+        .card-body { padding: 24px; }
+        .card-body-sm { padding: 16px 24px; }
+
+        /* ─── Forms ────────────────────────────────────────────────────── */
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; align-items: end; }
+        .form-field { display: flex; flex-direction: column; gap: 6px; }
+        .form-label { font-size: 12.5px; font-weight: 600; color: var(--slate-700); }
+        .form-input {
+            height: 42px; border: 1.5px solid var(--slate-200);
+            border-radius: 8px; padding: 0 14px;
+            font-size: 13.5px; font-family: 'Inter', sans-serif;
+            color: var(--corp-navy); background: var(--white);
+            transition: border-color .2s, box-shadow .2s; outline: none;
+        }
+        .form-input::placeholder { color: var(--slate-400); }
+        .form-input:focus { border-color: var(--corp-blue); box-shadow: 0 0 0 3px rgba(29,78,216,.12); }
+        select.form-input { cursor: pointer; }
+
+        /* ─── Buttons ──────────────────────────────────────────────────── */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+            height: 42px; padding: 0 20px;
+            border-radius: 8px; font-size: 13.5px; font-weight: 600;
+            font-family: 'Inter', sans-serif; cursor: pointer;
+            transition: all .18s; border: none; outline: none; white-space: nowrap;
+        }
+        .btn svg { width: 16px; height: 16px; }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--corp-blue), #2563eb);
+            color: #fff; box-shadow: 0 2px 8px rgba(29,78,216,.3);
+        }
+        .btn-primary:hover { background: linear-gradient(135deg, #1e40af, var(--corp-blue)); box-shadow: 0 4px 12px rgba(29,78,216,.4); transform: translateY(-1px); }
+        .btn-secondary { background: var(--white); color: var(--slate-700); border: 1.5px solid var(--slate-200); }
+        .btn-secondary:hover { background: var(--slate-100); border-color: var(--slate-300); }
+        .btn-danger { background: #fff; color: var(--corp-red); border: 1.5px solid rgba(220,38,38,.2); }
+        .btn-danger:hover { background: rgba(220,38,38,.06); border-color: var(--corp-red); }
+        .btn-sm { height: 34px; padding: 0 14px; font-size: 12.5px; }
+
+        /* ─── Messages ─────────────────────────────────────────────────── */
+        .message { border-radius: 8px; padding: 10px 14px; font-size: 13px; font-weight: 500; margin-top: 14px; }
+        .message.hidden { display: none; }
+        .message.success { background: rgba(22,163,74,.08); border: 1px solid rgba(22,163,74,.2); color: #15803d; }
+        .message.error { background: rgba(220,38,38,.07); border: 1px solid rgba(220,38,38,.2); color: #b91c1c; }
+
+        /* ─── Table ────────────────────────────────────────────────────── */
+        .table-wrap { overflow-x: auto; border-radius: var(--radius); }
+        .data-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+        .data-table thead th {
+            background: var(--slate-100); color: var(--slate-600);
+            font-size: 11.5px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: .6px;
+            padding: 10px 16px; text-align: left;
+            border-bottom: 1px solid var(--slate-200); white-space: nowrap;
+        }
+        .data-table tbody tr { border-bottom: 1px solid var(--slate-100); transition: background .12s; }
+        .data-table tbody tr:last-child { border-bottom: none; }
+        .data-table tbody tr:hover { background: var(--slate-50); }
+        .data-table tbody td { padding: 12px 16px; color: var(--corp-navy); vertical-align: middle; }
+        .table-actions { display: flex; gap: 6px; }
+
+        /* ─── Badges ───────────────────────────────────────────────────── */
+        .badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 11.5px; font-weight: 600; }
+        .badge-dot { width: 6px; height: 6px; border-radius: 50%; }
+        .badge-active  { background: rgba(22,163,74,.1);   color: #15803d; }
+        .badge-active .badge-dot  { background: #16a34a; }
+        .badge-offline { background: rgba(100,116,139,.1); color: var(--slate-600); }
+        .badge-offline .badge-dot { background: var(--slate-400); }
+
+        /* ─── Info Box ─────────────────────────────────────────────────── */
+        .info-box {
+            display: flex; align-items: flex-start; gap: 10px;
+            background: rgba(29,78,216,.06);
+            border: 1px solid rgba(29,78,216,.15);
+            border-left: 3px solid var(--corp-blue);
+            border-radius: 8px; padding: 12px 16px;
+            font-size: 13px; color: var(--slate-700); margin-top: 20px;
+        }
+        .info-box svg { width: 17px; height: 17px; color: var(--corp-blue); flex-shrink: 0; margin-top: 1px; }
+
+        /* ─── Modal ────────────────────────────────────────────────────── */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(15,23,42,.55);
+            backdrop-filter: blur(4px);
+            z-index: 200; display: none;
+            align-items: center; justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-box {
+            background: var(--white); border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            width: 100%; max-width: 480px; padding: 28px;
+            animation: modalIn .2s ease;
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(.96) translateY(-8px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+        .modal-head h2 { font-size: 17px; font-weight: 700; color: var(--corp-navy); }
+        .modal-close-btn {
+            background: var(--slate-100); border: none;
+            width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: var(--slate-600);
+            transition: background .15s, color .15s;
+        }
+        .modal-close-btn:hover { background: var(--slate-200); color: var(--corp-navy); }
+        .modal-close-btn svg { width: 17px; height: 17px; }
+        .modal-form-grid { display: flex; flex-direction: column; gap: 14px; }
+        .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 22px; }
+
+        /* ─── Responsive ───────────────────────────────────────────────── */
+        @media (max-width: 1024px) { :root { --sidebar-w: 220px; } .page-content { padding: 20px; } }
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .main-wrapper { margin-left: 0; }
+            .topbar { padding: 0 16px; }
+            .page-content { padding: 16px; }
+            .form-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ─── JS-generated button classes (used in staffTableBody) ────── */
+        .btn-primary, .btn-danger, .btn-success, .btn-secondary-js {
+            display: inline-flex; align-items: center; justify-content: center;
+            height: 30px; padding: 0 12px;
+            border-radius: 6px; font-size: 12px; font-weight: 600;
+            font-family: 'Inter', sans-serif; cursor: pointer;
+            border: none; outline: none; transition: all .16s;
+            white-space: nowrap;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--corp-blue), #2563eb);
+            color: #fff;
+        }
+        .btn-primary:hover { background: linear-gradient(135deg, #1e40af, var(--corp-blue)); transform: translateY(-1px); }
+        .btn-danger {
+            background: rgba(220,38,38,.1); color: var(--corp-red);
+            border: 1px solid rgba(220,38,38,.2);
+        }
+        .btn-danger:hover { background: rgba(220,38,38,.18); border-color: var(--corp-red); }
+        .btn-success {
+            background: rgba(22,163,74,.1); color: #15803d;
+            border: 1px solid rgba(22,163,74,.25);
+        }
+        .btn-success:hover { background: rgba(22,163,74,.18); border-color: #16a34a; }
+
+        /* ─── Action buttons container ─────────────────────────────────── */
+        .action-buttons { display: flex; gap: 5px; flex-wrap: wrap; }
+
+        /* ─── Status badges (JS-generated) ─────────────────────────────── */
+        .status-badge {
+            display: inline-flex; align-items: center;
+            padding: 3px 10px; border-radius: 20px;
+            font-size: 11.5px; font-weight: 600;
+        }
+        .status-active   { background: rgba(22,163,74,.1);   color: #15803d; }
+        .status-inactive { background: rgba(100,116,139,.1); color: var(--slate-600); }
+        .status-enabled  { background: rgba(13,148,136,.1);  color: var(--corp-teal); }
+        .status-disabled { background: rgba(100,116,139,.1); color: var(--slate-500); }
+
+        /* ── legacy: unused .icon class ─────────────────────────────────── */
+        .icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ════════════════════════════ SIDEBAR ════════════════════════════ -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="sidebar-brand-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+            </div>
+            <div class="sidebar-brand-text">
+                <h2>QueuePro</h2>
+                <span>Admin Panel</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="sidebar-section-label">Management</div>
+
+            <button class="sidebar-link active" data-section="section-staff">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0"/>
+                </svg>
+                Staff Management
+            </button>
+
+            <button class="sidebar-link" data-section="section-devices">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V9m-9-6l6 6m0-6v6h-6"/>
+                </svg>
+                Device Mapping
+            </button>
+
+            <div class="sidebar-section-label" style="margin-top:12px;">Reports</div>
+
+            <button class="sidebar-link" data-section="section-customers">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                </svg>
+                Customers
+            </button>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="sidebar-user-avatar" id="adminAvatar">A</div>
+                <div class="sidebar-user-info">
+                    <strong id="adminName">Admin</strong>
+                    <span>Administrator</span>
+                </div>
+                <button class="btn-logout" id="logoutBtn" title="Logout">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ════════════════════════════ MAIN ═══════════════════════════════ -->
+    <div class="main-wrapper">
+
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="topbar-title">
+                <h1 id="topbarTitle">Staff Management</h1>
+                <p id="topbarSub">Create, edit and monitor your team</p>
+            </div>
+            <div class="topbar-right">
+                <div class="admin-badge">
+                    <div class="admin-badge-dot"></div>
+                    <span>Admin Access</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <main class="page-content">
+
+            <!-- ── SECTION: Staff Management ────────────────────────── -->
+            <section id="section-staff" class="dash-section active">
+
+                <!-- Create Staff Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-header-left">
+                            <div class="card-icon blue">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="card-title">Create New Staff</div>
+                                <div class="card-subtitle">Add a staff member and assign their counter</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form id="createStaffForm">
+                            <div class="form-grid">
+                                <div class="form-field">
+                                    <label class="form-label" for="staffName">Staff Name</label>
+                                    <input class="form-input" type="text" id="staffName" placeholder="e.g. John Doe" required>
+                                </div>
+                                <div class="form-field">
+                                    <label class="form-label" for="counterName">Counter Name</label>
+                                    <input class="form-input" type="text" id="counterName" placeholder="e.g. Counter 1" required>
+                                </div>
+                                <div class="form-field">
+                                    <label class="form-label" for="staffEmail">Email Address</label>
+                                    <input class="form-input" type="email" id="staffEmail" placeholder="staff@example.com" required>
+                                </div>
+                                <div class="form-field">
+                                    <label class="form-label" for="staffPassword">Password</label>
+                                    <input class="form-input" type="password" id="staffPassword" placeholder="Set a password" required>
+                                </div>
+                                <div class="form-field" style="justify-content:flex-end;">
+                                    <button type="submit" class="btn btn-primary">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                                        </svg>
+                                        Create Staff
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        <div id="createStaffMessage" class="message hidden"></div>
+                    </div>
+                </div>
+
+                <!-- Staff List Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-header-left">
+                            <div class="card-icon teal">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="card-title">Manage Staff</div>
+                                <div class="card-subtitle">View and manage all staff accounts</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary btn-sm" id="refreshStaffBtn">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h5M20 20v-5h-5M4 9a9 9 0 0115 0M20 15a9 9 0 01-15 0"/>
+                            </svg>
+                            Refresh
+                        </button>
+                    </div>
+                    <div class="card-body-sm">
+                        <div id="staffListMessage" class="message hidden"></div>
+                        <div class="table-wrap">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Staff ID</th>
+                                        <th>Staff Name</th>
+                                        <th>Counter</th>
+                                        <th>Status</th>
+                                        <th>Live Tracking</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="staffTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ── SECTION: Device Mapping ───────────────────────────── -->
+            <section id="section-devices" class="dash-section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-header-left">
+                            <div class="card-icon amber">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V9m-9-6l6 6m0-6v6h-6"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="card-title">ESP32 Device Mapping</div>
+                                <div class="card-subtitle">Assign IoT devices to staff counters</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form id="deviceMappingForm">
+                            <div class="form-grid">
+                                <div class="form-field">
+                                    <label class="form-label" for="deviceId">Device ID</label>
+                                    <input class="form-input" type="text" id="deviceId" placeholder="Enter ESP32 device ID" required>
+                                </div>
+                                <div class="form-field">
+                                    <label class="form-label" for="mappedStaffId">Assign to Staff</label>
+                                    <select class="form-input" id="mappedStaffId" required>
+                                        <option value="">Select Staff Member</option>
+                                    </select>
+                                </div>
+                                <div class="form-field" style="justify-content:flex-end;">
+                                    <button type="submit" class="btn btn-primary">Map Device</button>
+                                </div>
+                            </div>
+                        </form>
+                        <div id="deviceMappingMessage" class="message hidden"></div>
+                        <div class="info-box">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <span><strong>Note:</strong> Only one staff member can have live tracking enabled at a time (prototype limitation).</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ── SECTION: Customers ────────────────────────────────── -->
+            <section id="section-customers" class="dash-section">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-header-left">
+                            <div class="card-icon blue">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="card-title">Registered Customers</div>
+                                <div class="card-subtitle">All customer accounts and visit history</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary btn-sm" id="refreshCustomersBtn">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h5M20 20v-5h-5M4 9a9 9 0 0115 0M20 15a9 9 0 01-15 0"/>
+                            </svg>
+                            Refresh
+                        </button>
+                    </div>
+                    <div class="card-body-sm">
+                        <div id="customerListMessage" class="message hidden"></div>
+                        <div class="table-wrap">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Phone</th>
+                                        <th>Email</th>
+                                        <th>Total Tokens</th>
+                                        <th>Completed</th>
+                                        <th>Last Visit</th>
+                                        <th>Registered</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="customerTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- ════════════════════════════ EDIT MODAL ══════════════════════════ -->
+    <div id="editStaffModal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-head">
+                <h2>Edit Staff Member</h2>
+                <button class="modal-close-btn" onclick="closeEditModal()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <form id="editStaffForm">
+                <input type="hidden" id="editStaffId">
+                <div class="modal-form-grid">
+                    <div class="form-field">
+                        <label class="form-label" for="editStaffName">Staff Name</label>
+                        <input class="form-input" type="text" id="editStaffName" required>
+                    </div>
+                    <div class="form-field">
+                        <label class="form-label" for="editCounterName">Counter Name</label>
+                        <input class="form-input" type="text" id="editCounterName" required>
+                    </div>
+                    <div class="form-field">
+                        <label class="form-label" for="editStaffEmail">Email Address</label>
+                        <input class="form-input" type="email" id="editStaffEmail" required>
+                    </div>
+                    <div class="form-field">
+                        <label class="form-label" for="editStaffPassword">
+                            New Password <span style="font-weight:400;color:var(--slate-400)">(leave blank to keep current)</span>
+                        </label>
+                        <input class="form-input" type="password" id="editStaffPassword" placeholder="Enter new password or leave blank">
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+            <div id="editStaffMessage" class="message hidden"></div>
+        </div>
+    </div>
+
+    <!-- ════════════════════════════ SCRIPTS ════════════════════════════ -->
+    <script>
+        // ── Sidebar navigation ──────────────────────────────────────────
+        const sectionMeta = {
+            'section-staff':     { title: 'Staff Management',   sub: 'Create, edit and monitor your team' },
+            'section-devices':   { title: 'Device Mapping',     sub: 'Assign IoT devices to staff counters' },
+            'section-customers': { title: 'Customers',          sub: 'All customer accounts and visit history' },
+        };
+
+        document.querySelectorAll('.sidebar-link[data-section]').forEach(link => {
+            link.addEventListener('click', () => {
+                const target = link.dataset.section;
+                document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                document.querySelectorAll('.dash-section').forEach(s => s.classList.remove('active'));
+                document.getElementById(target).classList.add('active');
+                const meta = sectionMeta[target];
+                document.getElementById('topbarTitle').textContent = meta.title;
+                document.getElementById('topbarSub').textContent   = meta.sub;
+            });
+        });
+
+        // ── Modal: patch display style → class toggle ───────────────────
+        function closeEditModal() {
+            document.getElementById('editStaffModal').classList.remove('open');
+        }
+
+        const _modal = document.getElementById('editStaffModal');
+        Object.defineProperty(_modal.style, 'display', {
+            set(val) {
+                if (val === 'flex' || val === 'block') _modal.classList.add('open');
+                else _modal.classList.remove('open');
+            },
+            get() { return _modal.classList.contains('open') ? 'flex' : 'none'; },
+            configurable: true
+        });
+
+        // ── Update avatar initial when adminName is set ─────────────────
+        const _nameObs = new MutationObserver(() => {
+            const name = document.getElementById('adminName').textContent.trim();
+            if (name) {
+                const av = document.getElementById('adminAvatar');
+                if (av) av.textContent = name.charAt(0).toUpperCase();
+            }
+        });
+        _nameObs.observe(document.getElementById('adminName'), { childList: true, characterData: true, subtree: true });
+    </script>
+
+    <script src="js/admin-dashboard.js"></script>
+</body>
+</html>
