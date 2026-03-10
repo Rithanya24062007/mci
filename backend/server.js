@@ -54,12 +54,12 @@ app.use((err, req, res, next) => {
     });
 });
 
-// Start server
-app.listen(PORT, () => {
+// Start server — bind 0.0.0.0 so ESP32 and other LAN devices can connect
+app.listen(PORT, '0.0.0.0', () => {
     console.log('=================================');
     console.log('Queue Management System - Backend');
     console.log('=================================');
-    console.log(`Server running on port ${PORT}`);
+    console.log(`Server running on 0.0.0.0:${PORT}`);
     console.log(`Environment: ${process.env.NODE_ENV}`);
     console.log(`Health check: http://localhost:${PORT}/health`);
     console.log('=================================');

@@ -25,11 +25,11 @@
 #include <ArduinoJson.h>        // Install: Arduino Library Manager → "ArduinoJson" by Benoit Blanchon
 
 // ── CONFIG — CHANGE THESE ────────────────────────────────────
-const char* WIFI_SSID      = "YOUR_WIFI_SSID";
-const char* WIFI_PASSWORD  = "YOUR_WIFI_PASSWORD";
+const char* WIFI_SSID      = "vishal";
+const char* WIFI_PASSWORD  = "12345678";
 
 // Your PC's local IP address (run `ipconfig` on Windows to find it)
-const char* SERVER_HOST    = "http://192.168.1.100:3000";
+const char* SERVER_HOST    = "http://10.229.158.168:3000";
 
 // Must match ESP32_API_KEY in backend/.env
 const char* DEVICE_API_KEY = "ESP32_SECRET_KEY_2026_CHANGE_IN_PRODUCTION";
