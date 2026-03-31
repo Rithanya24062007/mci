@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="navbar">
+        <h2>Staff Dashboard</h2>
+        <div class="nav-right">
+            <span id="staffNameDisplay"></span>
+            <button onclick="logout()" class="btn-secondary">Logout</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="dashboard">
+            <h1>Your Appointments</h1>
+            
+            <!-- Current Token Being Served -->
+            <div class="current-serving">
+                <h2>Currently Serving</h2>
+                <div id="currentServingToken" class="serving-token">
+                    <p>No active token</p>
+                </div>
+                <button onclick="callNextToken()" class="btn-primary">Call Next Token</button>
+            </div>
+
+            <!-- Statistics -->
+            <div class="queue-info">
+                <h3>Today's Statistics</h3>
+                <div class="info-cards">
+                    <div class="info-card">
+                        <h4>Pending Tokens</h4>
+                        <p class="info-number" id="pendingCount">0</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Completed Today</h4>
+                        <p class="info-number" id="completedCount">0</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Current Queue</h4>
+                        <p class="info-number" id="queueCount">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Appointments List -->
+            <div class="appointments-section">
+                <h2>Pending Appointments</h2>
+                <div class="filter-buttons">
+                    <button onclick="filterTokens('all')" class="filter-btn active">All</button>
+                    <button onclick="filterTokens('waiting')" class="filter-btn">Waiting</button>
+                    <button onclick="filterTokens('called')" class="filter-btn">Called</button>
+                </div>
+                <div id="appointmentsList" class="appointments-list">
+                    <!-- Appointments will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/staff.js"></script>
+</body>
+</html>

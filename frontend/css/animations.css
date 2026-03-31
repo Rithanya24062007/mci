@@ -1,0 +1,525 @@
+/* ===================================
+   Animations & Micro-interactions
+   Professional Animation Library
+   =================================== */
+
+/* ===================================
+   Keyframe Animations
+   =================================== */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateX(-50%) translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes scaleOut {
+    from {
+        transform: scale(1);
+        opacity: 1;
+    }
+    to {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(1.05);
+    }
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+        transform: translateX(-5px);
+    }
+    20%, 40%, 60%, 80% {
+        transform: translateX(5px);
+    }
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(0);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+
+@keyframes countUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes progress {
+    from {
+        transform: translateX(-100%);
+    }
+    to {
+        transform: translateX(100%);
+    }
+}
+
+/* ===================================
+   Animation Classes
+   =================================== */
+
+.fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.fade-out {
+    animation: fadeOut 0.3s ease-out;
+}
+
+.slide-down {
+    animation: slideDown 0.3s ease-out;
+}
+
+.slide-up {
+    animation: slideUp 0.3s ease-out;
+}
+
+.scale-in {
+    animation: scaleIn 0.2s ease-out;
+}
+
+.bounce {
+    animation: bounce 0.6s ease-in-out;
+}
+
+.pulse {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+.shake {
+    animation: shake 0.5s ease-in-out;
+}
+
+/* ===================================
+   Page Transitions
+   =================================== */
+
+.page-enter {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.page-exit {
+    animation: fadeOut 0.3s ease-out;
+}
+
+/* ===================================
+   Number Counter Animation
+   =================================== */
+
+.counter-up {
+    animation: countUp 0.5s ease-out;
+}
+
+/* Smoother number transitions */
+.number-transition {
+    transition: all 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+/* ===================================
+   Button Ripple Effect
+   =================================== */
+
+.btn-ripple {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-ripple::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn-ripple:active::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* ===================================
+   Card Hover Effects
+   =================================== */
+
+.card-lift {
+    transition: transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.card-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* ===================================
+   Loading States
+   =================================== */
+
+.loading-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(
+        90deg,
+        var(--color-primary) 0%,
+        var(--color-primary-light) 50%,
+        var(--color-primary) 100%
+    );
+    background-size: 200% 100%;
+    animation: progress 1.5s ease-in-out infinite;
+    z-index: var(--z-tooltip);
+}
+
+/* ===================================
+   Skeleton Loading
+   =================================== */
+
+@keyframes skeleton-pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.skeleton-loading {
+    animation: skeleton-pulse 2s ease-in-out infinite;
+}
+
+/* ===================================
+   Focus Effects
+   =================================== */
+
+.focus-ring {
+    transition: box-shadow var(--transition-fast);
+}
+
+.focus-ring:focus {
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+/* ===================================
+   Hover Transitions
+   =================================== */
+
+.hover-scale {
+    transition: transform var(--transition-fast);
+}
+
+.hover-scale:hover {
+    transform: scale(1.05);
+}
+
+.hover-brightness {
+    transition: filter var(--transition-fast);
+}
+
+.hover-brightness:hover {
+    filter: brightness(1.1);
+}
+
+/* ===================================
+   Text Animations
+   =================================== */
+
+.text-glow {
+    animation: textGlow 2s ease-in-out infinite;
+}
+
+@keyframes textGlow {
+    0%, 100% {
+        text-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
+    }
+    50% {
+        text-shadow: 0 0 20px rgba(37, 99, 235, 0.8);
+    }
+}
+
+/* ===================================
+   List Animations (Stagger Effect)
+   =================================== */
+
+.stagger-item {
+    opacity: 0;
+    animation: slideUp 0.4s ease-out forwards;
+}
+
+.stagger-item:nth-child(1) { animation-delay: 0.05s; }
+.stagger-item:nth-child(2) { animation-delay: 0.1s; }
+.stagger-item:nth-child(3) { animation-delay: 0.15s; }
+.stagger-item:nth-child(4) { animation-delay: 0.2s; }
+.stagger-item:nth-child(5) { animation-delay: 0.25s; }
+.stagger-item:nth-child(6) { animation-delay: 0.3s; }
+
+/* ===================================
+   Toggle Switch Animation
+   =================================== */
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 52px;
+    height: 28px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--color-gray-300);
+    transition: 0.3s;
+    border-radius: 28px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background-color: var(--color-primary);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(24px);
+}
+
+.toggle-switch input:focus + .toggle-slider {
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+/* ===================================
+   Notification Dot Pulse
+   =================================== */
+
+.notification-dot {
+    position: relative;
+}
+
+.notification-dot::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 8px;
+    height: 8px;
+    background-color: var(--color-danger);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* ===================================
+   Progress Circle
+   =================================== */
+
+@keyframes rotate-circle {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.progress-circle {
+    animation: rotate-circle 2s linear infinite;
+}
+
+/* ===================================
+   Tooltip Fade
+   =================================== */
+
+.tooltip {
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.tooltip.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ===================================
+   Smooth Scroll
+   =================================== */
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* ===================================
+   Reduced Motion
+   =================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ===================================
+   Performance Optimizations
+   =================================== */
+
+/* GPU acceleration for animations */
+.gpu-accelerate {
+    transform: translateZ(0);
+    will-change: transform;
+}
+
+/* Smooth font rendering during animations */
+.smooth-text {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}

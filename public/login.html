@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Token Reservation System - Login</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="login-box">
+            <h1>Token Reservation System</h1>
+
+            <!-- Customer Login -->
+            <div id="customerLogin" class="tab-content active">
+                <h2>Customer Login</h2>
+                <form id="customerLoginForm">
+                    <div class="form-group">
+                        <label for="loginPhone">Phone Number</label>
+                        <input type="tel" id="loginPhone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Login</button>
+                </form>
+                <p>Don't have an account? <a href="signup.html">Sign up here</a></p>
+            </div>
+
+            <!-- Staff Login -->
+            <div id="staffTab" class="tab-content">
+                <h2>Staff Login</h2>
+                <form id="staffLoginForm">
+                    <div class="form-group">
+                        <label for="staffId">Staff ID</label>
+                        <input type="text" id="staffId" placeholder="Enter staff ID" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="staffPassword">Password</label>
+                        <input type="password" id="staffPassword" placeholder="Enter password" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Login</button>
+                </form>
+                <p class="info-text">Default credentials: ID: staff1, Password: pass123</p>
+            </div>
+        </div>
+
+        <div class="queue-status">
+            <h3>Current Queue Status</h3>
+            <p class="queue-count">People in Queue: <span id="queueCount">0</span></p>
+        </div>
+    </div>
+
+    <script src="js/login.js"></script>
+</body>
+</html>

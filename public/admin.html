@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Staff Management</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="login-box">
+            <h1>Admin - Staff Management</h1>
+            <form id="adminLoginForm">
+                <div class="form-group">
+                    <label for="adminUsername">Admin Username</label>
+                    <input type="text" id="adminUsername" required placeholder="Enter admin username">
+                </div>
+                <div class="form-group">
+                    <label for="adminPassword">Admin Password</label>
+                    <input type="password" id="adminPassword" required placeholder="Enter admin password">
+                </div>
+                <button type="submit" class="btn-primary">Sign In</button>
+            </form>
+            <div id="adminPanel" style="display:none;">
+                <h2>Create Staff Credentials</h2>
+                <form id="createStaffForm">
+                    <div class="form-group">
+                        <label for="newStaffId">Staff ID</label>
+                        <input type="text" id="newStaffId" required placeholder="Enter staff ID">
+                    </div>
+                    <div class="form-group">
+                        <label for="newStaffName">Name</label>
+                        <input type="text" id="newStaffName" required placeholder="Enter staff name">
+                    </div>
+                    <div class="form-group">
+                        <label for="newStaffPassword">Password</label>
+                        <input type="password" id="newStaffPassword" required placeholder="Enter password">
+                    </div>
+                    <div class="form-group">
+                        <label for="newStaffDepartment">Department</label>
+                        <input type="text" id="newStaffDepartment" required placeholder="Enter department">
+                    </div>
+                    <button type="submit" class="btn-primary">Create Staff</button>
+                </form>
+                <div id="staffListSection">
+                    <h3>Existing Staff</h3>
+                    <ul id="staffList"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="js/admin.js"></script>
+</body>
+</html>

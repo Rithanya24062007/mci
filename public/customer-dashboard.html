@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="navbar">
+        <h2>Token Reservation System</h2>
+        <div class="nav-right">
+            <span id="customerNameDisplay"></span>
+            <button onclick="logout()" class="btn-secondary">Logout</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="dashboard">
+            <h1>Book Your Token</h1>
+            
+            <!-- Current Token Display (if exists) -->
+            <div id="currentTokenSection" class="token-display" style="display: none;">
+                <h2>Your Current Token</h2>
+                <div class="token-number">
+                    Token #<span id="currentTokenNumber"></span>
+                </div>
+                <div class="token-details">
+                    <p><strong>Staff:</strong> <span id="tokenStaff"></span></p>
+                    <p><strong>Estimated Wait:</strong> <span id="estimatedTime"></span> minutes</p>
+                    <p><strong>People Ahead:</strong> <span id="peopleAhead"></span></p>
+                    <p><strong>Status:</strong> <span id="tokenStatus" class="status-badge"></span></p>
+                </div>
+                <button onclick="cancelToken()" class="btn-danger">Cancel Token</button>
+            </div>
+
+            <!-- Booking Form -->
+            <div id="bookingFormSection" class="booking-form">
+                <h2>Book New Token</h2>
+                <form id="tokenBookingForm">
+                    <div class="form-group">
+                        <label for="bookingName">Name</label>
+                        <input type="text" id="bookingName" required readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bookingPhone">Phone Number</label>
+                        <input type="tel" id="bookingPhone" required readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="staffSelect">Select Staff</label>
+                        <select id="staffSelect" required>
+                            <option value="">-- Select Staff --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="purpose">Purpose of Visit (Optional)</label>
+                        <textarea id="purpose" rows="3" placeholder="Brief description of your requirement"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Book Token</button>
+                </form>
+            </div>
+
+            <!-- Queue Information -->
+            <div class="queue-info">
+                <h3>Queue Information</h3>
+                <div class="info-cards">
+                    <div class="info-card">
+                        <h4>Current Queue</h4>
+                        <p class="info-number" id="currentQueue">0</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Total Tokens Today</h4>
+                        <p class="info-number" id="totalTokens">0</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>Avg Wait Time</h4>
+                        <p class="info-number" id="avgWaitTime">5 min</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/customer.js"></script>
+</body>
+</html>

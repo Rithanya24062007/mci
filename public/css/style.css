@@ -1,0 +1,472 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Navbar */
+.navbar {
+    background: white;
+    padding: 15px 30px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.navbar h2 {
+    color: #667eea;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.nav-right span {
+    font-weight: 600;
+    color: #333;
+}
+
+/* Login Box */
+.login-box {
+    background: white;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    max-width: 450px;
+    margin: 0 auto 30px;
+}
+
+.login-box h1 {
+    text-align: center;
+    color: #667eea;
+    margin-bottom: 30px;
+    font-size: 28px;
+}
+
+.login-box h2 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 22px;
+}
+
+/* Tabs */
+.tab-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid #667eea;
+    background: white;
+    color: #667eea;
+    cursor: pointer;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.tab-btn:hover {
+    background: #f0f0f0;
+}
+
+.tab-btn.active {
+    background: #667eea;
+    color: white;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Forms */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 600;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.form-group textarea {
+    resize: vertical;
+    font-family: inherit;
+}
+
+/* Buttons */
+.btn-primary,
+.btn-secondary,
+.btn-danger,
+.btn-success {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background: #667eea;
+    color: white;
+    width: 100%;
+}
+
+.btn-primary:hover {
+    background: #5568d3;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+}
+
+.btn-success {
+    background: #28a745;
+    color: white;
+}
+
+.btn-success:hover {
+    background: #218838;
+}
+
+/* Queue Status */
+.queue-status {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    max-width: 450px;
+    margin: 0 auto;
+}
+
+.queue-status h3 {
+    color: #667eea;
+    margin-bottom: 15px;
+}
+
+.queue-count {
+    font-size: 24px;
+    color: #333;
+    font-weight: 600;
+}
+
+.queue-count span {
+    color: #667eea;
+    font-size: 32px;
+}
+
+/* Dashboard */
+.dashboard {
+    background: white;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.dashboard h1 {
+    color: #667eea;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+/* Token Display */
+.token-display {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.token-display h2 {
+    margin-bottom: 20px;
+}
+
+.token-number {
+    font-size: 48px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+}
+
+.token-details {
+    text-align: left;
+    margin: 20px 0;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.token-details p {
+    margin: 10px 0;
+    font-size: 18px;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 5px 15px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.3);
+    font-weight: 600;
+}
+
+/* Booking Form */
+.booking-form {
+    margin-bottom: 30px;
+}
+
+.booking-form h2 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Queue Info */
+.queue-info {
+    margin-top: 30px;
+}
+
+.queue-info h3 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.info-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.info-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 25px;
+    border-radius: 15px;
+    text-align: center;
+    color: white;
+}
+
+.info-card h4 {
+    margin-bottom: 15px;
+    font-size: 16px;
+    opacity: 0.9;
+}
+
+.info-number {
+    font-size: 36px;
+    font-weight: bold;
+}
+
+/* Staff Dashboard */
+.current-serving {
+    background: #f8f9fa;
+    padding: 30px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.current-serving h2 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.serving-token {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    border: 3px solid #667eea;
+}
+
+.serving-token h3 {
+    color: #667eea;
+    font-size: 42px;
+    margin-bottom: 15px;
+}
+
+.serving-token p {
+    font-size: 18px;
+    color: #333;
+    margin: 8px 0;
+}
+
+/* Appointments Section */
+.appointments-section {
+    margin-top: 30px;
+}
+
+.appointments-section h2 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.filter-btn {
+    padding: 10px 20px;
+    border: 2px solid #667eea;
+    background: white;
+    color: #667eea;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.filter-btn:hover {
+    background: #f0f0f0;
+}
+
+.filter-btn.active {
+    background: #667eea;
+    color: white;
+}
+
+.appointments-list {
+    display: grid;
+    gap: 15px;
+}
+
+.appointment-card {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    border-left: 5px solid #667eea;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.appointment-info {
+    flex: 1;
+}
+
+.appointment-info h4 {
+    color: #667eea;
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.appointment-info p {
+    color: #666;
+    margin: 5px 0;
+}
+
+.appointment-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.appointment-actions button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.info-text {
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+    margin-top: 15px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .login-box,
+    .dashboard {
+        padding: 20px;
+    }
+
+    .info-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .appointment-card {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .appointment-actions {
+        width: 100%;
+        justify-content: center;
+    }
+}

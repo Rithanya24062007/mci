@@ -1,20 +1,18 @@
 /*
  * ============================================================
  *  QueuePro — ESP32 People Counter
- *  Dual HC-SR04 Ultrasonic Sensor (Entry + Exit)
+ *  Dual IR Reflective Sensors (Entry + Exit)
  *
  *  Entry sensor triggered  → POST /device/event  { sensor: "entry" }  → count +1
  *  Exit  sensor triggered  → POST /device/event  { sensor: "exit"  }  → count -1
  *
- *  Wiring:
+ *  Wiring (IR modules):
  *  ┌──────────────┬────────────┐
- *  │ HC-SR04 Pin  │ ESP32 GPIO │
+ *  │ IR Signal    │ ESP32 GPIO │
  *  ├──────────────┼────────────┤
- *  │ ENTRY TRIG   │ GPIO 5     │
- *  │ ENTRY ECHO   │ GPIO 18    │
- *  │ EXIT  TRIG   │ GPIO 19    │
- *  │ EXIT  ECHO   │ GPIO 21    │
- *  │ VCC          │ 5V         │
+ *  │ ENTRY OUT    │ GPIO 5     │
+ *  │ EXIT OUT     │ GPIO 19    │
+ *  │ VCC          │ 3.3V - 5V   │
  *  │ GND          │ GND        │
  *  └──────────────┴────────────┘
  * ============================================================
@@ -25,11 +23,11 @@
 #include <ArduinoJson.h>        // Install: Arduino Library Manager → "ArduinoJson" by Benoit Blanchon
 
 // ── CONFIG — CHANGE THESE ────────────────────────────────────
-const char* WIFI_SSID      = "vishal";
-const char* WIFI_PASSWORD  = "12345678";
+const char* WIFI_SSID      = "Muthuraj";
+const char* WIFI_PASSWORD  = "muthu128";
 
 // Your PC's local IP address (run `ipconfig` on Windows to find it)
-const char* SERVER_HOST    = "http://10.229.158.168:3000";
+const char* SERVER_HOST    = "http://10.74.242.168:3000";
 
 // Must match ESP32_API_KEY in backend/.env
 const char* DEVICE_API_KEY = "ESP32_SECRET_KEY_2026_CHANGE_IN_PRODUCTION";
@@ -37,36 +35,28 @@ const char* DEVICE_API_KEY = "ESP32_SECRET_KEY_2026_CHANGE_IN_PRODUCTION";
 // Must match the device_id you mapped in Admin → Device Mapping
 const char* DEVICE_ID      = "ESP32_001";
 
-// Detection threshold in cm — trigger when object closer than this
-const int   DETECT_THRESHOLD_CM = 80;
+// IR sensor configuration
+// IR modules commonly output LOW when an object is detected (active-low).
+// If your sensors output HIGH on detection, change to HIGH below.
+const int IR_ACTIVE_STATE = LOW; // set to HIGH if your IR sensor is active-high
 
 // Cooldown between detections on same sensor (ms) — prevents double-count
 const unsigned long COOLDOWN_MS = 2000;
 // ─────────────────────────────────────────────────────────────
 
 // ── PIN DEFINITIONS ──────────────────────────────────────────
-#define ENTRY_TRIG  5
-#define ENTRY_ECHO  18
-#define EXIT_TRIG   19
-#define EXIT_ECHO   21
+#define ENTRY_PIN   5   // IR sensor digital output for entry
+#define EXIT_PIN    19  // IR sensor digital output for exit
 // ─────────────────────────────────────────────────────────────
 
 unsigned long lastEntryTime = 0;
 unsigned long lastExitTime  = 0;
-
 // ─────────────────────────────────────────────────────────────
-// Measure distance with HC-SR04 (returns cm, -1 on timeout)
+// IR detection helper — returns true when sensor indicates object
 // ─────────────────────────────────────────────────────────────
-float measureDistance(int trigPin, int echoPin) {
-    digitalWrite(trigPin, LOW);
-    delayMicroseconds(2);
-    digitalWrite(trigPin, HIGH);
-    delayMicroseconds(10);
-    digitalWrite(trigPin, LOW);
-
-    long duration = pulseIn(echoPin, HIGH, 30000); // 30ms timeout ≈ 510cm max
-    if (duration == 0) return -1;                  // timeout / no echo
-    return (duration * 0.0343f) / 2.0f;            // convert µs → cm
+bool isDetected(int pin) {
+    int v = digitalRead(pin);
+    return (v == IR_ACTIVE_STATE);
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -110,10 +100,9 @@ void setup() {
     delay(500);
 
     // Pin setup
-    pinMode(ENTRY_TRIG, OUTPUT);
-    pinMode(ENTRY_ECHO, INPUT);
-    pinMode(EXIT_TRIG,  OUTPUT);
-    pinMode(EXIT_ECHO,  INPUT);
+    // Use internal pull-up for typical active-low IR modules
+    pinMode(ENTRY_PIN, INPUT_PULLUP);
+    pinMode(EXIT_PIN,  INPUT_PULLUP);
 
     // Connect to WiFi
     Serial.printf("\n[WiFi] Connecting to %s", WIFI_SSID);
@@ -130,24 +119,22 @@ void setup() {
 void loop() {
     unsigned long now = millis();
 
-    // ── Entry sensor ──────────────────────────────────────────
-    float entryDist = measureDistance(ENTRY_TRIG, ENTRY_ECHO);
-    if (entryDist > 0 && entryDist < DETECT_THRESHOLD_CM) {
+    // ── Entry sensor (IR) ─────────────────────────────────────
+    if (isDetected(ENTRY_PIN)) {
         if (now - lastEntryTime > COOLDOWN_MS) {
             lastEntryTime = now;
-            Serial.printf("[ENTRY] Object detected at %.1f cm\n", entryDist);
+            Serial.println("[ENTRY] IR sensor triggered");
             sendEvent("entry");
         }
     }
 
     delay(60); // small gap between measurements
 
-    // ── Exit sensor ───────────────────────────────────────────
-    float exitDist = measureDistance(EXIT_TRIG, EXIT_ECHO);
-    if (exitDist > 0 && exitDist < DETECT_THRESHOLD_CM) {
+    // ── Exit sensor (IR) ──────────────────────────────────────
+    if (isDetected(EXIT_PIN)) {
         if (now - lastExitTime > COOLDOWN_MS) {
             lastExitTime = now;
-            Serial.printf("[EXIT]  Object detected at %.1f cm\n", exitDist);
+            Serial.println("[EXIT] IR sensor triggered");
             sendEvent("exit");
         }
     }
