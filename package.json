@@ -4,8 +4,9 @@
   "description": "Token reservation system with ESP32 integration for crowd control",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js",
+    "start:legacy": "node server.js"
   },
   "keywords": ["token", "reservation", "queue", "esp32"],
   "author": "",

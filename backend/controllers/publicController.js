@@ -118,11 +118,27 @@ const checkTokenStatus = async (req, res) => {
             [staffId]
         );
 
+        const currentServingToken = Number.parseInt(queueResult.rows[0]?.current_serving_token || 0);
+        let aheadCount = 0;
+
+        // For waiting customers, count both waiting tokens ahead and the currently serving token (if it is ahead).
+        if (token.status === 'waiting') {
+            const aheadResult = await pool.query(
+                'SELECT COUNT(*) as count FROM tokens WHERE staff_id = $1 AND status = $2 AND token_number < $3',
+                [staffId, 'waiting', tokenNumber]
+            );
+
+            const waitingAheadCount = Number.parseInt(aheadResult.rows[0]?.count || 0);
+            const hasServingAhead = currentServingToken > 0 && currentServingToken < tokenNumber ? 1 : 0;
+            aheadCount = waitingAheadCount + hasServingAhead;
+        }
+
         res.json({
             tokenNumber: tokenNumber,
             status: token.status,
             completedAt: token.completed_at,
-            currentServingToken: queueResult.rows[0]?.current_serving_token || 0
+            currentServingToken,
+            aheadCount
         });
 
     } catch (error) {

@@ -301,9 +301,10 @@ async function updateTokenStatus() {
         // First check if token is completed
         const statusResponse = await fetch(`${API_BASE_URL}/public/staff/${selectedStaffId}/token/${currentToken}/status`);
         
+        let statusData = null;
         if (statusResponse.ok) {
-            const statusData = await statusResponse.json();
-            
+            statusData = await statusResponse.json();
+
             // If token is completed, show completion message and stop polling
             if (statusData.status === 'completed') {
                 showCompletedStatus(statusData.completedAt);
@@ -314,28 +315,49 @@ async function updateTokenStatus() {
                 return;
             }
         }
-        
-        // Otherwise, get queue info and update status
-        const response = await fetch(`${API_BASE_URL}/public/staff/${selectedStaffId}/queue-info`);
-        
-        if (response.ok) {
-            const data = await response.json();
-            const currentServing = data.currentServingToken || 0;
-            const waitingCount = data.waitingCount || 0;
-            
-            document.getElementById('displayCurrentServing').textContent = currentServing;
-            
-            // Calculate difference: positive means ahead, 0 means your turn, negative means passed
-            const difference = currentToken - currentServing;
-            const tokensAhead = Math.max(0, difference - 1); // tokens between current and yours
-            
-            document.getElementById('tokensAhead').textContent = tokensAhead;
-            
-            // Calculate and display estimated time
-            updateEstimatedTime(tokensAhead);
-            
-            // Update status based on difference
-            updateStatusDisplay(difference, tokensAhead);
+
+        // Use server-provided aheadCount (more accurate) from the status endpoint when available
+        let currentServing = 0;
+        let aheadCount = null;
+
+        if (statusData) {
+            currentServing = statusData.currentServingToken || 0;
+            aheadCount = typeof statusData.aheadCount === 'number' ? statusData.aheadCount : null;
+        }
+
+        if (aheadCount === null) {
+            // fallback: fetch queue-info and compute locally
+            const response = await fetch(`${API_BASE_URL}/public/staff/${selectedStaffId}/queue-info`);
+            if (response.ok) {
+                const data = await response.json();
+                currentServing = data.currentServingToken || 0;
+                const waitingAheadEstimate = Math.max(0, currentToken - currentServing - 1);
+                const hasServingAhead = currentServing > 0 && currentServing < currentToken ? 1 : 0;
+                aheadCount = waitingAheadEstimate + hasServingAhead;
+                document.getElementById('waitingCount').textContent = data.waitingCount || 0;
+            } else {
+                // if all fails, assume no one ahead
+                aheadCount = 0;
+            }
+        }
+
+        document.getElementById('displayCurrentServing').textContent = currentServing;
+        document.getElementById('tokensAhead').textContent = aheadCount;
+
+        // Update estimated time and status using aheadCount
+        updateEstimatedTime(aheadCount);
+        const difference = currentToken - currentServing;
+        updateStatusDisplay(difference, aheadCount);
+
+        // Also refresh waiting count (separate endpoint) so UI shows accurate waiting numbers
+        try {
+            const qresp = await fetch(`${API_BASE_URL}/public/staff/${selectedStaffId}/queue-info`);
+            if (qresp.ok) {
+                const qdata = await qresp.json();
+                document.getElementById('waitingCount').textContent = qdata.waitingCount || 0;
+            }
+        } catch (e) {
+            // ignore extra fetch errors
         }
     } catch (error) {
         console.error('Error updating token status:', error);
@@ -373,7 +395,7 @@ function updateStatusDisplay(difference, tokensAhead) {
     const statusElement = document.getElementById('tokenStatus');
     
     // Your turn RIGHT NOW
-    if (difference <= 0) {
+    if (tokensAhead === 0 || difference <= 0) {
         statusElement.innerHTML = `
             <div class="token-status-box serving">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -386,9 +408,8 @@ function updateStatusDisplay(difference, tokensAhead) {
             </div>
         `;
         playNotificationSound();
-        
-    // Next in line (1-2 tokens ahead)
-    } else if (tokensAhead <= 1) {
+    // Next in line (1 token ahead)
+    } else if (tokensAhead === 1) {
         statusElement.innerHTML = `
             <div class="token-status-box" style="background:rgba(29,78,216,.07);border:1px solid rgba(29,78,216,.2);">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:24px;height:24px;color:#1d4ed8;flex-shrink:0;">
@@ -400,7 +421,20 @@ function updateStatusDisplay(difference, tokensAhead) {
                 </div>
             </div>
         `;
-        
+    // Two people away — nudge to be ready
+    } else if (tokensAhead === 2) {
+        statusElement.innerHTML = `
+            <div class="token-status-box" style="background:rgba(249,115,22,.06);border:1px solid rgba(249,115,22,.12);">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:24px;height:24px;color:#f97316;flex-shrink:0;">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <div>
+                    <div class="token-status-title">Get Ready</div>
+                    <div class="token-status-msg" id="statusMessage">Only ${tokensAhead} people ahead — please be ready</div>
+                </div>
+            </div>
+        `;
+
     // Still waiting (3+ tokens ahead)
     } else {
         statusElement.innerHTML = `
