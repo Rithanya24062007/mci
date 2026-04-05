@@ -1,6 +1,13 @@
 const bcrypt = require('bcrypt');
 const pool = require('../config/database');
 
+const normalizeDeviceId = (value) => {
+    if (typeof value !== 'string') {
+        return '';
+    }
+    return value.trim().toUpperCase();
+};
+
 // Create new staff
 const createStaff = async (req, res) => {
     const { name, counterName, email, password } = req.body;
@@ -160,28 +167,45 @@ const toggleLiveTracking = async (req, res) => {
 // Map device to staff
 const mapDevice = async (req, res) => {
     const { device_id, mapped_staff_id } = req.body;
+    const normalizedDeviceId = normalizeDeviceId(device_id);
+    const normalizedStaffId = Number(mapped_staff_id);
 
-    if (!device_id || !mapped_staff_id) {
+    if (!normalizedDeviceId || !Number.isInteger(normalizedStaffId) || normalizedStaffId <= 0) {
         return res.status(400).json({ error: 'device_id and mapped_staff_id are required' });
     }
 
     try {
         // Check if staff exists
-        const staffCheck = await pool.query('SELECT id FROM staff WHERE id = $1', [mapped_staff_id]);
+        const staffCheck = await pool.query('SELECT id FROM staff WHERE id = $1', [normalizedStaffId]);
 
         if (staffCheck.rows.length === 0) {
             return res.status(404).json({ error: 'Staff not found' });
         }
 
-        // Insert or update device mapping
-        const result = await pool.query(
-            `INSERT INTO devices (device_id, mapped_staff_id) 
-             VALUES ($1, $2) 
-             ON CONFLICT (device_id) 
-             DO UPDATE SET mapped_staff_id = $2 
+        // Update existing mapping when the same device id exists with different casing/spacing.
+        let result = await pool.query(
+            `UPDATE devices
+             SET device_id = $1, mapped_staff_id = $2
+             WHERE id = (
+                SELECT id
+                FROM devices
+                WHERE UPPER(TRIM(device_id)) = $1
+                LIMIT 1
+             )
              RETURNING *`,
-            [device_id, mapped_staff_id]
+            [normalizedDeviceId, normalizedStaffId]
         );
+
+        if (result.rows.length === 0) {
+            result = await pool.query(
+                `INSERT INTO devices (device_id, mapped_staff_id)
+                 VALUES ($1, $2)
+                 ON CONFLICT (device_id)
+                 DO UPDATE SET mapped_staff_id = EXCLUDED.mapped_staff_id
+                 RETURNING *`,
+                [normalizedDeviceId, normalizedStaffId]
+            );
+        }
 
         res.json({
             message: 'Device mapped successfully',

@@ -1,5 +1,12 @@
 const pool = require('../config/database');
 
+const normalizeDeviceId = (value) => {
+    if (typeof value !== 'string') {
+        return '';
+    }
+    return value.trim().toUpperCase();
+};
+
 /**
  * POST /device/event
  * Called by ESP32 with header x-device-key and body { device_id, sensor: "entry"|"exit" }
@@ -8,8 +15,9 @@ const pool = require('../config/database');
  */
 const recordSensorEvent = async (req, res) => {
     const { device_id, sensor } = req.body;
+    const normalizedDeviceId = normalizeDeviceId(device_id);
 
-    if (!device_id || !sensor) {
+    if (!normalizedDeviceId || !sensor) {
         return res.status(400).json({ error: 'device_id and sensor ("entry" or "exit") are required' });
     }
 
@@ -23,8 +31,8 @@ const recordSensorEvent = async (req, res) => {
 
         // Look up which staff this device is mapped to
         const deviceResult = await client.query(
-            'SELECT mapped_staff_id FROM devices WHERE device_id = $1',
-            [device_id]
+            'SELECT mapped_staff_id FROM devices WHERE UPPER(TRIM(device_id)) = $1',
+            [normalizedDeviceId]
         );
 
         if (deviceResult.rows.length === 0) {
@@ -44,7 +52,7 @@ const recordSensorEvent = async (req, res) => {
                  count      = GREATEST(0, live_count.count + $3),
                  updated_at = CURRENT_TIMESTAMP
              RETURNING count`,
-            [device_id, staffId, delta]
+            [normalizedDeviceId, staffId, delta]
         );
 
         const newCount = countResult.rows[0].count;
@@ -52,14 +60,14 @@ const recordSensorEvent = async (req, res) => {
         // Log the individual sensor event
         await client.query(
             'INSERT INTO sensor_events (device_id, staff_id, event_type) VALUES ($1, $2, $3)',
-            [device_id, staffId, sensor]
+            [normalizedDeviceId, staffId, sensor]
         );
 
         await client.query('COMMIT');
 
         res.json({
             success: true,
-            device_id,
+            device_id: normalizedDeviceId,
             event: sensor,
             people_count: newCount
         });
@@ -79,16 +87,22 @@ const recordSensorEvent = async (req, res) => {
  */
 const getDeviceCount = async (req, res) => {
     const { device_id } = req.params;
+    const normalizedDeviceId = normalizeDeviceId(device_id);
+
+    if (!normalizedDeviceId) {
+        return res.status(400).json({ error: 'device_id is required' });
+    }
+
     try {
         const result = await pool.query(
-            'SELECT count, updated_at FROM live_count WHERE device_id = $1',
-            [device_id]
+            'SELECT count, updated_at FROM live_count WHERE UPPER(TRIM(device_id)) = $1',
+            [normalizedDeviceId]
         );
         if (result.rows.length === 0) {
-            return res.json({ device_id, people_count: 0, updated_at: null });
+            return res.json({ device_id: normalizedDeviceId, people_count: 0, updated_at: null });
         }
         res.json({
-            device_id,
+            device_id: normalizedDeviceId,
             people_count: result.rows[0].count,
             updated_at: result.rows[0].updated_at
         });
