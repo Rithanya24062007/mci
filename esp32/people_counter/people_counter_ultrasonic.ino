@@ -13,15 +13,14 @@
  *  - ECHO -> ESP32 GPIO (input, use voltage divider to 3.3V-safe level)
  *
  *  Entry sensor pins:
- *  - TRIG: GPIO 5
- *  - ECHO: GPIO 18
+ *  - TRIG: GPIO 25
+ *  - ECHO: GPIO 26
  *
  *  Exit sensor pins:
- *  - TRIG: GPIO 19
- *  - ECHO: GPIO 21
+ *  - TRIG: GPIO 32
+ *  - ECHO: GPIO 33
  * ============================================================
  */
-
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
@@ -34,16 +33,16 @@ const char* DEVICE_API_KEY = "ESP32_SECRET_KEY_2026_CHANGE_IN_PRODUCTION";
 const char* DEVICE_ID      = "ESP32_001";
 
 // Distance threshold for detection (cm)
-const float DETECT_DISTANCE_CM = 20.0f;
+const float DETECT_DISTANCE_CM = 3.0f;
 
 // Cooldown per sensor to prevent double count (ms)
-const unsigned long COOLDOWN_MS = 2000;
+const unsigned long COOLDOWN_MS = 1000;
 
 // -- PIN DEFINITIONS --
-#define ENTRY_TRIG_PIN 5
-#define ENTRY_ECHO_PIN 18
-#define EXIT_TRIG_PIN  19
-#define EXIT_ECHO_PIN  21
+#define ENTRY_TRIG_PIN 25
+#define ENTRY_ECHO_PIN 26
+#define EXIT_TRIG_PIN  32
+#define EXIT_ECHO_PIN  33
 
 unsigned long lastEntryTime = 0;
 unsigned long lastExitTime  = 0;
@@ -67,12 +66,12 @@ float readDistanceCm(int trigPin, int echoPin) {
     return (duration * 0.0343f) / 2.0f;
 }
 
-bool isDetected(int trigPin, int echoPin) {
-    float distance = readDistanceCm(trigPin, echoPin);
-    if (distance < 0.0f) {
-        return false;
+float readSafeDistanceCm(int trigPin, int echoPin) {
+    float d = readDistanceCm(trigPin, echoPin);
+    if (d < 0.0f) {
+        return 999.0f;
     }
-    return distance <= DETECT_DISTANCE_CM;
+    return d;
 }
 
 void sendEvent(const char* sensorType) {
@@ -85,6 +84,8 @@ void sendEvent(const char* sensorType) {
     String url = String(SERVER_HOST) + "/device/event";
 
     http.begin(url);
+    http.setConnectTimeout(3000);  // 3 second timeout
+    http.setTimeout(3000);         // 3 second timeout for response
     http.addHeader("Content-Type", "application/json");
     http.addHeader("x-device-key", DEVICE_API_KEY);
 
@@ -135,8 +136,10 @@ void setup() {
 
 void loop() {
     unsigned long now = millis();
+    float entryDistance = readSafeDistanceCm(ENTRY_TRIG_PIN, ENTRY_ECHO_PIN);
+    float exitDistance = readSafeDistanceCm(EXIT_TRIG_PIN, EXIT_ECHO_PIN);
 
-    if (isDetected(ENTRY_TRIG_PIN, ENTRY_ECHO_PIN)) {
+    if (entryDistance <= DETECT_DISTANCE_CM) {
         if (now - lastEntryTime > COOLDOWN_MS) {
             lastEntryTime = now;
             Serial.println("[ENTRY] Ultrasonic sensor triggered");
@@ -146,7 +149,7 @@ void loop() {
 
     delay(60);
 
-    if (isDetected(EXIT_TRIG_PIN, EXIT_ECHO_PIN)) {
+    if (exitDistance <= DETECT_DISTANCE_CM) {
         if (now - lastExitTime > COOLDOWN_MS) {
             lastExitTime = now;
             Serial.println("[EXIT] Ultrasonic sensor triggered");

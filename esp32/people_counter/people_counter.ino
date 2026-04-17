@@ -42,6 +42,11 @@ const int IR_ACTIVE_STATE = LOW; // set to HIGH if your IR sensor is active-high
 
 // Cooldown between detections on same sensor (ms) — prevents double-count
 const unsigned long COOLDOWN_MS = 2000;
+
+// Ignore the opposite sensor for a short period after a valid event.
+// This prevents rapid entry->exit or exit->entry double counts caused by
+// overlap, bounce, or both sensors seeing the same person.
+const unsigned long OPPOSITE_SENSOR_LOCKOUT_MS = 1200;
 // ─────────────────────────────────────────────────────────────
 
 // ── PIN DEFINITIONS ──────────────────────────────────────────
@@ -51,6 +56,10 @@ const unsigned long COOLDOWN_MS = 2000;
 
 unsigned long lastEntryTime = 0;
 unsigned long lastExitTime  = 0;
+unsigned long lastAnyEventTime = 0;
+int lastEventType = 0; // 1 = entry, -1 = exit, 0 = none
+bool entryWasDetected = false;
+bool exitWasDetected  = false;
 // ─────────────────────────────────────────────────────────────
 // IR detection helper — returns true when sensor indicates object
 // ─────────────────────────────────────────────────────────────
@@ -118,26 +127,44 @@ void setup() {
 // ─────────────────────────────────────────────────────────────
 void loop() {
     unsigned long now = millis();
+    bool entryDetected = isDetected(ENTRY_PIN);
+    bool exitDetected = isDetected(EXIT_PIN);
 
     // ── Entry sensor (IR) ─────────────────────────────────────
-    if (isDetected(ENTRY_PIN)) {
-        if (now - lastEntryTime > COOLDOWN_MS) {
+    if (entryDetected && !entryWasDetected) {
+        bool blockedByOppositeLockout =
+            (lastEventType == -1) && (now - lastAnyEventTime < OPPOSITE_SENSOR_LOCKOUT_MS);
+
+        if (blockedByOppositeLockout) {
+            Serial.println("[ENTRY] Ignored by opposite-sensor lockout");
+        } else if (now - lastEntryTime > COOLDOWN_MS) {
             lastEntryTime = now;
+            lastAnyEventTime = now;
+            lastEventType = 1;
             Serial.println("[ENTRY] IR sensor triggered");
             sendEvent("entry");
         }
     }
+    entryWasDetected = entryDetected;
 
     delay(60); // small gap between measurements
 
     // ── Exit sensor (IR) ──────────────────────────────────────
-    if (isDetected(EXIT_PIN)) {
-        if (now - lastExitTime > COOLDOWN_MS) {
+    if (exitDetected && !exitWasDetected) {
+        bool blockedByOppositeLockout =
+            (lastEventType == 1) && (now - lastAnyEventTime < OPPOSITE_SENSOR_LOCKOUT_MS);
+
+        if (blockedByOppositeLockout) {
+            Serial.println("[EXIT] Ignored by opposite-sensor lockout");
+        } else if (now - lastExitTime > COOLDOWN_MS) {
             lastExitTime = now;
+            lastAnyEventTime = now;
+            lastEventType = -1;
             Serial.println("[EXIT] IR sensor triggered");
             sendEvent("exit");
         }
     }
+    exitWasDetected = exitDetected;
 
     delay(60);
 }
