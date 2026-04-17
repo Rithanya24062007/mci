@@ -41,7 +41,7 @@ async function setupDatabase() {
 
         await adminClient.end();
 
-        // Now connect to the new database to run schema and seed
+        // Now connect to the new database to run the full database setup script
         const dbClient = new Client({
             host: 'localhost',
             port: 5432,
@@ -52,20 +52,14 @@ async function setupDatabase() {
 
         await dbClient.connect();
 
-        // Run schema
-        console.log('Step 4: Running schema...');
-        const schemaSQL = fs.readFileSync(path.join(__dirname, 'database', 'schema.sql'), 'utf8');
-        await dbClient.query(schemaSQL);
-        console.log('✓ Schema created\n');
-
-        // Run seed data
-        console.log('Step 5: Seeding initial data...');
-        const seedSQL = fs.readFileSync(path.join(__dirname, 'database', 'seed.sql'), 'utf8');
-        await dbClient.query(seedSQL);
-        console.log('✓ Data seeded\n');
+        // Run the complete database setup file
+        console.log('Step 4: Running complete database setup...');
+        const completeSQL = fs.readFileSync(path.join(__dirname, 'database', 'complete_database.sql'), 'utf8');
+        await dbClient.query(completeSQL);
+        console.log('✓ Schema created and data seeded\n');
 
         // Verify setup
-        console.log('Step 6: Verifying setup...');
+        console.log('Step 5: Verifying setup...');
         const staffCount = await dbClient.query('SELECT COUNT(*) as count FROM staff;');
         const userCount = await dbClient.query('SELECT COUNT(*) as count FROM users;');
         const deviceCount = await dbClient.query('SELECT COUNT(*) as count FROM devices;');
@@ -80,8 +74,7 @@ async function setupDatabase() {
         console.log('Setup Complete!');
         console.log('============================================\n');
         console.log('Default Accounts:');
-        console.log('  Admin:  admin@example.com / admin123');
-        console.log('  Staff:  sarah.johnson@example.com / admin123\n');
+        console.log('  Admin:  admin@queuepro.com / admin123\n');
         console.log('Next Steps:');
         console.log('  1. Run: npm start');
         console.log('  2. Open: http://localhost:3000\n');
